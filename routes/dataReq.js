@@ -32,12 +32,15 @@ exports.getWinners = function(req, res){
 };
 
 exports.getCurrentItem = function(req, res){
-  if (req.query.gender === "male"){
+  if (req.query.userData.gender === "male"){
     res.writeHead(200);
     res.end(JSON.stringify(state.currentItem.male));
-  } else if (req.query.gender === "female"){
+  } else if (req.query.userData.gender === "female"){
     res.writeHead(200);
     res.end(JSON.stringify(state.currentItem.female));
+  } else{
+    res.writeHead(200);
+    res.end(JSON.stringify(state.currentItem.male));
   }
 };
 
@@ -129,6 +132,8 @@ var determineNextItem = function(){
 
 var eventLoop = function(){
   startOfRound = new Date();
+  state.currentWinner.male = null;
+  state.currentWinner.female = null;
   currentItem = determineNextItem(); 
   setTimeout(eventLoop, roundLength);
 };
