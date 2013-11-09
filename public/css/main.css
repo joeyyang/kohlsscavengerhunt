@@ -343,6 +343,13 @@ p {
   background-color: #4da355;
   font-size: 16px;
 }
+.hunt-input-text {
+  display: block;
+  width: 50%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 12px;
+}
 @media (max-width: 991px) {
   h1 {
     margin-top: 67px;
@@ -491,6 +498,9 @@ p {
     padding-left: 0px;
     float: left;
   }
+  .hunt-input-text {
+    width: 70%;
+  }
 }
 @media (max-width: 479px) {
   body {
@@ -597,5 +607,8 @@ p {
   }
   .hunt-item {
     background-color: rgba(77, 176, 109, 0);
+  }
+  .hunt-input-text {
+    width: 95%;
   }
 }
