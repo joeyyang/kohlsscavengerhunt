@@ -1,11 +1,11 @@
 var httpGet = require('http-get');
 var config = require('../config');
-var leaderboard = require('../controllers/leaderboard');
+var leaderboard = require('../controllers/leaderBoard');
 var startOfRound;
 
 /////Game Config
-var roundLength = 20000;
-
+var roundLength = 10000;
+var restLength = 5000;
 
 var state = {
   'currentItem': {
@@ -21,7 +21,7 @@ var state = {
     }
   },
   'currentWinner': {
-    'male': "James Bond", 
+    'male': "James Bond",
     'female': "Jenny Bond"
   }
 };
@@ -33,19 +33,12 @@ exports.getWinners = function(req, res){
 
 exports.getCurrentItem = function(req, res){
   res.writeHead(200);
-  if (req.query.userData.gender === "male"){
-    var data = JSON.stringify({
-      item : state.currentItem.male,
-      roundEnd : startOfRound + roundLength
-    });
-    res.end(data);
-  } else{
-    var data = JSON.stringify({
-      item : state.currentItem.female,
-      roundEnd : startOfRound + roundLength
-    });
-    res.end(data);
-  } 
+  var data = {
+    roundEnd: startOfRound + roundLength,
+    nextRound: startOfRound + roundLength + restLength,
+    item: (req.query.userData.gender === "male" ? state.currentItem.male : state.currentItem.female)
+  };
+  res.end(JSON.stringify(data));
 };
 
 exports.checkCurrentItem = function(req, res){
@@ -73,7 +66,7 @@ exports.checkCurrentItem = function(req, res){
 
 var checkWinner = function(gender, guess, name, related) {
   var sendBack = {};
-  console.log(state.currentItem[gender].upc)
+  console.log(state.currentItem[gender].upc);
   if (parseInt(guess) === state.currentItem[gender].upc) {
     sendBack.correct = true;
     // sendBack.winner = state.currentWinner[gender];
@@ -154,8 +147,8 @@ var eventLoop = function(){
   startOfRound = new Date();
   state.currentWinner.male = null;
   state.currentWinner.female = null;
-  determineNextItem(); 
-  setTimeout(eventLoop, roundLength);
+  determineNextItem();
+  setTimeout(eventLoop, roundLength + restLength);
 };
 
 eventLoop();

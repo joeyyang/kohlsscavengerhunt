@@ -28,7 +28,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   return service;
 })
 
-.factory('resultService', function() {
+.factory('storageService', function() {
   var service = {};
 
   service.lastResult = {};
@@ -38,6 +38,22 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       return service.lastResult;
     } else {
       service.lastResult = value;
+    }
+  };
+
+  service.nextRound = function (value) {
+    if (value) {
+      return service.nextRound;
+    } else {
+      service.nextRound = value;
+    }
+  };
+
+  service.roundEnd = function (value) {
+    if (value) {
+      return service.roundEnd;
+    } else {
+      service.roundEnd = value;
     }
   };
 
@@ -65,14 +81,12 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   };
 
   service.verify = function(guess) {
-    console.log("Sending guess.");
     var d = $q.defer();
     $http({
       url: "/guess",
       method: "POST",
       data: {userData: userService.data, guess: guess}
     }).success(function (data) {
-      console.log("Retrieved data from post request!");
       d.resolve(data);
     }).error(function (err) {
       d.reject(err);
@@ -87,8 +101,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       method: "GET",
       params: {numberOfWinners: 1}
     }).success(function (data) {
-      console.log("Retrieved data from get request!");
-      d.resolve(data);
+      console.log("Got number of winners: ", data);
+      d.resolve(data[0]);
     }).error(function (err) {
       d.reject(err);
     });
@@ -117,25 +131,28 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 })
 
-.controller("huntController", function(reqsService, resultService, $location, $scope) {
+.controller("huntController", function(reqsService, storageService, $location, $scope) {
 
   reqsService.getItem().then(
     function (data) {
-      console.log("retrieved items");
-      var roundEnd = new Date(data.roundEnd);
+      storageService.roundEnd(data.roundEnd);
+      storageService.nextRound(data.nextRound);
       $scope.item = data.item;
-      $scope.time = Math.floor((new Date() - roundEnd)/1000);
-
-      console.log (roundEnd, $scope.time);
+      $scope.time = Math.floor((new Date() - storageService.roundEnd())/1000);
 
       var countdown = setInterval(function() {
-        $scope.time--;
+        $scope.$apply(function() {
+          console.log("tick! ", $scope.time);
+          $scope.time--;
+        });
       }, 1000);
 
       setTimeout(function() {
-        resultService.last({correct: false});
-        clearInterval(countdown);
-        $location.path('/result');
+        $scope.$apply(function() {
+          storageService.last({correct: false});
+          clearInterval(countdown);
+          $location.path('/result');
+        });
       }, 1000 * $scope.time + 500);
     },
     function (err) {
@@ -151,8 +168,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       reqsService.verify($scope.guess).then(
         function (data) {
           if (data.correct) {
-            console.log('HOLY SHIT I WON');
-            resultService.last(data);
+            storageService.last(data);
             $location.path('/result');
           } else {
             $scope.error = true;
@@ -168,10 +184,10 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 })
 
-.controller("resultController", function(reqsService, resultService, $location, $scope) {
-  $scope.result = resultService.last();
+.controller("resultController", function(reqsService, storageService, $location, $scope) {
+  $scope.result = storageService.last();
   $scope.winner = reqsService.getWinner();
-  $scope.result.time = 10;
+  $scope.time = 10;
 
   $scope.playAgain = function() {
     $location.path('/hunt');
