@@ -128,6 +128,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       reqsService.verify($scope.guess).then(
         function (data) {
           if (data.correct) {
+            console.log('HOLY SHIT I WON')
             resultService.last(data);
             $location.path('/result');
           } else {
