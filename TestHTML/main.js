@@ -44,7 +44,7 @@ var renderHunt = function() {
   });
 
   $('button').click(function (e) {
-
+    
   });
 
   $('#time').text(formatTime(time));
