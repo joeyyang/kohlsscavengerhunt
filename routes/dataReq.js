@@ -2,7 +2,6 @@ var httpGet = require('http-get');
 var config = require('../config');
 var leaderboard = require('../controllers/leaderboard');
 var startOfRound;
-var endOfRound;
 
 /////Game Config
 var roundLength = 8000;
@@ -19,6 +18,11 @@ var state = {
   }
 };
 
+exports.getWinners = function(req, res){
+  res.writeHead(200);
+  res.end(JSON.stringify(leaderboard(getWinners(req.body.numberOfWinners))));
+};
+
 exports.getCurrentItem = function(req, res){
   if (req.query.gender === "male"){
     res.writeHead(200);
@@ -32,7 +36,7 @@ exports.getCurrentItem = function(req, res){
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
   var sendBack = checkWinner(req.data.userData.gender, req.data.guess, req.data.UserData.name);
-  sendBack.timeLeft = startOfRound + roundLength;
+  sendBack.endOfRound = startOfRound + roundLength;
   res.end(JSON.stringify(sendBack));  
 };
 
@@ -113,7 +117,6 @@ var determineNextItem = function(){
 
 var eventLoop = function(){
   startOfRound = new Date();
-  endOfRound = startOfRound + roundLength;
   currentItem = determineNextItem(); 
   setTimeout(eventLoop, roundLength);
 };
