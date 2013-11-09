@@ -2,40 +2,45 @@
 var httpGet = require('http-get');
 var config = require('../config');
 var state = {
-  'currentItemMale': 0,
-  'currentItemFemale': 0,
-  'currentMaleWinner': "James Bond", 
-  'currentFemaleWinner': "Jenny Bond"
+  'currentItem': {
+    'male': 0,
+    'female': 0
+  },
+  'currentWinner': {
+    'male': "James Bond", 
+    'female': "Jenny Bond"
+  }
 };
 
 exports.getCurrentItem = function(req, res){
   if (req.query.gender === "male"){
     res.writeHead(200);
-    res.end(JSON.stringify(state.currentItemMale));
+    res.end(JSON.stringify(state.currentItem.male));
   } else if (req.query.gender === "female"){
     res.writeHead(200);
-    res.end(JSON.stringify(state.currentItemFemale));
+    res.end(JSON.stringify(state.currentItem.female));
   }
 };
 
 exports.checkCurrentItem = function(req, res){
+  res.writeHead(200);
+  var received = req.data;
+  var sendBack = checkWinner(received.userData.gender, received.guess);
+  res.end(JSON.stringify(sendBack));  
+};
+
+var checkWinner = function(gender, guess) {
   var sendBack = {};
-  if (req.data.userData.gender === "male"){
-    res.writeHead(200);
-    if (req.data.guess === state.currentItemMale) {
-      sendBack.correct = true;
-      sendBack.winner = currentMaleWinner;    
-      sendBack.place = [2, 20];               // hardcoded
-      sendBack.couponCode = "youwin";         // hardcoded
-    } else {
-      sendBack.correct = false;
-      sendBack.winner = currentFemaleWinner;   
-    }
-    res.end(JSON.stringify(sendBack));
-  } else if (req.data.userData.gender === "female"){
-    res.writeHead(200);
-    res.end(JSON.stringify(state.currentItemFemale));
+  if (guess === state.currentItem[gender]) {
+    sendBack.correct = true;
+    sendBack.winner = currentWinner[gender];
+    sendBack.place = [2, 20];                 // hardcoded
+    sendBack.couponCode = "youwin";           // hardcoded
+  } else {
+    sendBack.correct = false;
+    sendBack.winner = currentWinner[gender];
   }
+  return sendBack;
 };
 
 
@@ -68,7 +73,7 @@ var determineNextItem = function(){
     } else {
       console.log('The response HTTP headers: ' + result.headers);
       console.log(JSON.parse(result.buffer).payload.products[0]);
-      state.currentItemMale = {
+      state.currentItem.male = {
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
       }
@@ -88,7 +93,7 @@ var determineNextItem = function(){
       console.error(error);
     } else {
       console.log('The response HTTP headers: ' + result.headers);
-      state.currentItemFemale = {
+      state.currentItem.female = {
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
       }
