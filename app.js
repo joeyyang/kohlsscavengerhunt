@@ -29,6 +29,8 @@ if ('development' == app.get('env')) {
 
 app.get('/getCurrentItem', dataReq.getCurrentItem);
 app.post('/guess', dataReq.checkCurrentItem);
+app.get('/getWinners', dataReq.getWinners);
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

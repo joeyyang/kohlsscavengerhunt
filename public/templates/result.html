@@ -1,4 +1,6 @@
-<p>The winner is {{winner}}!</p>
+<p ng-show="winner">The winner is {{winner}}!</p>
+<p ng-hide="winner">No one won this round!</p>
+
 
 <p ng-show="result.correct">You got {{result.place[0]}} out of {{result.place[1]}} players.</p>
 <p ng-hide="result.correct">Better luck next time!</p>
