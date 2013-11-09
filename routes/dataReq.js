@@ -9,21 +9,11 @@ var restLength = 5000;
 
 var state = {
   'currentItem': {
-    'male': {
       link: null,
       title: null,
       upc: null
-    },
-    'female': {
-      link: null,
-      title: null,
-      upc: null
-    }
   },
-  'currentWinner': {
-    'male': "James Bond",
-    'female': "Jenny Bond"
-  }
+  'currentWinner': null
 };
 
 exports.getWinners = function(req, res){
@@ -36,53 +26,42 @@ exports.getCurrentItem = function(req, res){
   var data = {
     roundEnd: startOfRound + roundLength,
     nextRound: startOfRound + roundLength + restLength,
-    item: (req.query.userData.gender === "male" ? state.currentItem.male : state.currentItem.female)
+    item: state.currentItem
   };
   res.end(JSON.stringify(data));
 };
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
-  var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name);
+  var sendBack = checkWinner(req.body.guess, req.body.userData.name);
   res.end(JSON.stringify(sendBack));
 };
 
-
-var checkWinner = function(gender, guess, name) {
+var checkWinner = function(guess, name) {
   var sendBack = {};
-  console.log(state.currentItem[gender].upc);
-  if (parseInt(guess) === state.currentItem[gender].upc) {
+  console.log(state.currentItem.upc);
+  if (parseInt(guess) === state.currentItem.upc) {
     sendBack.correct = true;
-    // sendBack.winner = state.currentWinner[gender];
     sendBack.place = [2, 20];                 // hardcoded
     sendBack.couponCode = "youwin";           // hardcoded
-    leaderboard.addWinner(name, new Date() - startOfRound, gender);
+    leaderboard.addWinner(name, new Date() - startOfRound);
   } else {
     sendBack.correct = false;
-    sendBack.winner = state.currentWinner[gender];
+    sendBack.winner = state.currentWinner;
   }
   console.log(sendBack);
   return sendBack;
 };
 
-
 var determineNextItem = function(){
-  var upcMale = [727506537518,
-                760925051784,
-                786888332067,
-                649652095103,
-                400932356754];
+  var upc = [727506537518,
+            760925051784,
+            786888332067,
+            649652095103,
+            400932356754];
 
-  var upcFemale = [727506537518,
-                  760925051784,
-                  786888332067,
-                  649652095103,
-                  400932356754];
-
-
-  var randomUPCMale = upcMale[~~(Math.random()*upcMale.length)];
-
-  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPCMale,
+  var randomUPC = upc[~~(Math.random()*upc.length)];
+  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
                 bufferType: "buffer",
                 headers: {
                   'X-APP-API_KEY': config['X-APP-API_KEY'],
@@ -95,29 +74,8 @@ var determineNextItem = function(){
       console.error(error);
     } else {
       // console.log(JSON.parse(result.buffer).payload.products[0]);
-      state.currentItem.male = {
-        upc: randomUPCMale,
-        link: JSON.parse(result.buffer).payload.products[0].images[0].url,
-        title: JSON.parse(result.buffer).payload.products[0].productTitle
-      }
-    }
-  });
-
-  var randomUPCFemale = upcFemale[~~(Math.random()*upcFemale.length)];
-
-  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPCFemale,
-                bufferType: "buffer",
-                headers: {
-                  'X-APP-API_KEY': config['X-APP-API_KEY'],
-                  'Accept': 'application/json'
-                  }
-                };
-  httpGet.get(options, function (error, result) {
-    if (error) {
-      console.error(error);
-    } else {
-      state.currentItem.female = {
-        upc: randomUPCFemale,
+      state.currentItem = {
+        upc: randomUPC,
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
       }
@@ -128,8 +86,7 @@ var determineNextItem = function(){
 
 var eventLoop = function(){
   startOfRound = new Date();
-  state.currentWinner.male = null;
-  state.currentWinner.female = null;
+  state.currentWinner = null;
   determineNextItem();
   setTimeout(eventLoop, roundLength + restLength);
 };
