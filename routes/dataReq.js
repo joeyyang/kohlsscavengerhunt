@@ -1,13 +1,13 @@
 
 var httpGet = require('http-get');
-
+var config = require('../config')
 
 exports.doGet = function(req,res){
 
 
   var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?skuCode=91100247', 
                  headers: {
-                  'X-APP-API_KEY': 'bow0DMyPSUZAZIfCBsp48CoXmLUQhQmD',
+                  'X-APP-API_KEY': config['X-APP-API_KEY'],
                   'Accept': 'application/json'
                   }
                 };
