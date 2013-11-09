@@ -32,21 +32,24 @@ exports.getWinners = function(req, res){
 };
 
 exports.getCurrentItem = function(req, res){
-  if (req.query.gender === "male"){
-    res.writeHead(200);
-    res.end(JSON.stringify(state.currentItem.male));
-  } else if (req.query.gender === "female"){
-    res.writeHead(200);
-    res.end(JSON.stringify(state.currentItem.female));
-  }
+  res.writeHead(200);
+  if (req.query.userData.gender === "male"){
+    var data = JSON.stringify({
+      item : state.currentItem.male,
+      roundEnd : startOfRound + roundLength
+    });
+    res.end(data);
+  } else{
+    var data = JSON.stringify({
+      item : state.currentItem.female,
+      roundEnd : startOfRound + roundLength
+    });
+    res.end(data);
+  } 
 };
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
-  console.log('-------',req.body.userData)
-  console.log('-------',req.body.userData.gender)
-  console.log('-------',req.body.userData.name)
-  console.log('-------',req.body.guess)
   var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name);
   sendBack.endOfRound = startOfRound + roundLength;
   res.end(JSON.stringify(sendBack));  
@@ -133,7 +136,9 @@ var determineNextItem = function(){
 
 var eventLoop = function(){
   startOfRound = new Date();
-  currentItem = determineNextItem(); 
+  state.currentWinner.male = null;
+  state.currentWinner.female = null;
+  determineNextItem(); 
   setTimeout(eventLoop, roundLength);
 };
 
