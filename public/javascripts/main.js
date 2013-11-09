@@ -6,6 +6,23 @@ var formatTime = function (seconds) {
   return mins + ":" + secs;
 };
 
+var verify = function (guess) {
+  if (guess.toLowerCase() === "llama") return true;
+  return false;
+};
+
+var onEnterOrClick = function(enterTarget, clickTarget, callback) {
+  var args = Array.prototype.slice.call(arguments, 3);
+  enterTarget.on('keyUp', function (e) {
+    if (e.keyCode == 13) {
+      callback.apply(this, args);
+    }
+  });
+  clickTarget.click(function() {
+    callback.apply(this, args);
+  });
+};
+
 var renderLanding = function() {
   var source = $("#landing_template").html();
   var template = Handlebars.compile(source);
@@ -35,19 +52,20 @@ var renderHunt = function() {
 
   $('#container').html(template({
     target: target,
-    img_link: target + ".jpg"
+    img_link: "images/" + target + ".jpg"
   }));
 
-  $('input').on('keyup', function (e) {
-    if (e.keyCode == 13) {
+  $('#error').hide();
+  $('#time').text(formatTime(time));
+
+  onEnterOrClick($('input'), $('button'), function(guess, error) {
+    if (verify($('input').val())) {
+      clearInterval(countdown);
+      renderResult(true);
+    } else {
+      $('#error').show();
     }
   });
-
-  $('button').click(function (e) {
-    
-  });
-
-  $('#time').text(formatTime(time));
 
   var countdown = setInterval(function() {
     time--;
@@ -80,6 +98,11 @@ var renderResult = function(win) {
   } else {
     $('.victory').hide();
   }
+
+  $('button').click(function() {
+    clearInterval(countdown);
+    renderHunt();
+  });
 
   var countdown = setInterval(function() {
     time--;

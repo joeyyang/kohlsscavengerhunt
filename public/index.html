@@ -1,10 +1,69 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Kohl's Scavenger Hunt</title>
-    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' type='text/css'>
     <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
   <body>
-  Hello World
+    <header>
+      <img src="logo_header.jpg" class="logo">
+      <img src="stash.jpg" class="stash">
+    </header>
+    <div id="container">
+    </div>
+
+
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
+
+    <script id="hunt_template" type="text/x-handlebars-template">
+      <p>{{target}}</p>
+      <img src='{{img_link}}'>
+
+      <p>Time left:</p>
+      <p id='time'></p>
+
+      <input type='text' placeholder="Enter product code here..."/><br>
+      <button>Found it!</button>
+      <p id='error'>Sorry, keep looking!</p>
+    </script>
+
+    <script id="result_template" type="text/x-handlebars-template">
+      <p class="winner">The winner is {{winner}}!</p>
+
+      <p class="victory">You got {{place}} out of {{total_players}} players.</p>
+      <p class="defeat">Better luck next time!</p>
+
+      <p class="victory">Your coupon code is:</p>
+      <p class="victory code">{{code}}</p>
+      <p class="victory save">Save to my stash!</p>
+
+      <p class="defeat">Find an item within two minutes to win your coupon code</p>
+
+      <p>The next round begins in:</p>
+      <p id='time'></p>
+
+      <p>Play again?</p>
+      <button>Yes!</button>
+    </script>
+
+    <script id="landing_template" type="text/x-handlebars-template">
+      <img src="logo_big.jpg">
+      <p>Scavenger Hunt</p>
+
+      <button>Log in with Facebook!</button>
+    </script>
+
+    <script id="howToPlay_template" type="text/x-handlebars-template">
+      <p>How to Play:</p>
+      <ul>
+        <li>We give you the name of a product.</li>
+        <li>Track it down and type in the UPC code: <img src="UPC_ex.jpg"></li>
+        <li>Find it within two minutes to get a special deal!</li>
+        <li>Compete against players around the country!</li>
+      </ul>
+      <button>Got it!</button>
+    </script>
+    <script src="javascripts/main.js"></script>
   </body>
 </html>
