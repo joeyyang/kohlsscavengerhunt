@@ -1,7 +1,12 @@
 var httpGet = require('http-get');
 var config = require('../config');
 var leaderboard = require('../controllers/leaderboard');
-var time = new Date();
+var startOfRound;
+var endOfRound;
+
+/////Game Config
+var roundLength = 8000;
+
 
 var state = {
   'currentItem': {
@@ -26,19 +31,26 @@ exports.getCurrentItem = function(req, res){
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
+<<<<<<< HEAD
+  var sendBack = checkWinner(req.data.userData.gender, req.data.guess, req.data.UserData.name);
+  sendBack.timeLeft = startOfRound + roundLength;
+=======
   var received = req.body;
   var sendBack = checkWinner(received.userData.gender, received.guess);
   leaderBoard(received.userData.name, time, state.currentItem.male)
+>>>>>>> master
   res.end(JSON.stringify(sendBack));  
 };
 
-var checkWinner = function(gender, guess) {
+
+var checkWinner = function(gender, guess, name) {
   var sendBack = {};
   if (guess === state.currentItem[gender]) {
     sendBack.correct = true;
     sendBack.winner = currentWinner[gender];
     sendBack.place = [2, 20];                 // hardcoded
     sendBack.couponCode = "youwin";           // hardcoded
+    leaderBoard(name, new Date() - startOfRound, gender);
   } else {
     sendBack.correct = false;
     sendBack.winner = currentWinner[gender];
@@ -64,7 +76,8 @@ var determineNextItem = function(){
   var randomUPC = upcMale[~~(Math.random()*upcMale.length)];
 
   var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
-                 headers: {
+                bufferType: "buffer",
+                headers: {
                   'X-APP-API_KEY': config['X-APP-API_KEY'],
                   'Accept': 'application/json'
                   }
@@ -74,8 +87,7 @@ var determineNextItem = function(){
     if (error) {
       console.error(error);
     } else {
-      console.log('The response HTTP headers: ' + result.headers);
-      console.log(JSON.parse(result.buffer).payload.products[0]);
+      // console.log(JSON.parse(result.buffer).payload.products[0]);
       state.currentItem.male = {
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
@@ -86,7 +98,8 @@ var determineNextItem = function(){
   var randomUPC = upcFemale[~~(Math.random()*upcFemale.length)];
 
   var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
-                 headers: {
+                bufferType: "buffer",
+                headers: {
                   'X-APP-API_KEY': config['X-APP-API_KEY'],
                   'Accept': 'application/json'
                   }
@@ -95,7 +108,6 @@ var determineNextItem = function(){
     if (error) {
       console.error(error);
     } else {
-      console.log('The response HTTP headers: ' + result.headers);
       state.currentItem.female = {
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
@@ -106,8 +118,10 @@ var determineNextItem = function(){
 
 
 var eventLoop = function(){
+  startOfRound = new Date();
+  endOfRound = startOfRound + roundLength;
   currentItem = determineNextItem(); 
-  setTimeout(eventLoop, 4000);
+  setTimeout(eventLoop, roundLength);
 };
 
 eventLoop();
