@@ -195,3 +195,24 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 });
 
 
+
+var getZip = function(){
+  var lng, lat;
+  navigator.geolocation.getCurrentPosition(
+    function showPosition(position){
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=true_or_false')
+        .success(function(data) {
+          console.log(data);
+      })
+    })
+};
+
+
+
+
+
+
+
+

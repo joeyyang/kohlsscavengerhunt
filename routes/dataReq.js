@@ -28,7 +28,7 @@ var state = {
 
 exports.getWinners = function(req, res){
   res.writeHead(200);
-  res.end(JSON.stringify(leaderboard.getWinners(req.body.numberOfWinners)));
+  res.end(JSON.stringify(leaderboard.getWinners(req.query.numberOfWinners)));
 };
 
 exports.getCurrentItem = function(req, res){
