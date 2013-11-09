@@ -4,13 +4,21 @@ var leaderboard = require('../controllers/leaderboard');
 var startOfRound;
 
 /////Game Config
-var roundLength = 8000;
+var roundLength = 20000;
 
 
 var state = {
   'currentItem': {
-    'male': 0,
-    'female': 0
+    'male': {
+      link: null,
+      title: null,
+      upc: null
+    },
+    'female': {
+      link: null,
+      title: null,
+      upc: null
+    }
   },
   'currentWinner': {
     'male': "James Bond", 
@@ -35,7 +43,11 @@ exports.getCurrentItem = function(req, res){
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
-  var sendBack = checkWinner(req.data.userData.gender, req.data.guess, req.data.UserData.name);
+  console.log('-------',req.body.userData)
+  console.log('-------',req.body.userData.gender)
+  console.log('-------',req.body.userData.name)
+  console.log('-------',req.body.guess)
+  var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name);
   sendBack.endOfRound = startOfRound + roundLength;
   res.end(JSON.stringify(sendBack));  
 };
@@ -43,16 +55,18 @@ exports.checkCurrentItem = function(req, res){
 
 var checkWinner = function(gender, guess, name) {
   var sendBack = {};
-  if (guess === state.currentItem[gender]) {
+  console.log(state.currentItem[gender].upc)
+  if (parseInt(guess) === state.currentItem[gender].upc) {
     sendBack.correct = true;
-    sendBack.winner = currentWinner[gender];
+    // sendBack.winner = state.currentWinner[gender];
     sendBack.place = [2, 20];                 // hardcoded
     sendBack.couponCode = "youwin";           // hardcoded
-    leaderBoard(name, new Date() - startOfRound, gender);
+    leaderboard.addWinner(name, new Date() - startOfRound, gender);
   } else {
     sendBack.correct = false;
-    sendBack.winner = currentWinner[gender];
+    sendBack.winner = state.currentWinner[gender];
   }
+  console.log(sendBack);
   return sendBack;
 };
 
@@ -71,9 +85,9 @@ var determineNextItem = function(){
                   400932356754];
 
 
-  var randomUPC = upcMale[~~(Math.random()*upcMale.length)];
+  var randomUPCMale = upcMale[~~(Math.random()*upcMale.length)];
 
-  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
+  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPCMale,
                 bufferType: "buffer",
                 headers: {
                   'X-APP-API_KEY': config['X-APP-API_KEY'],
@@ -87,15 +101,16 @@ var determineNextItem = function(){
     } else {
       // console.log(JSON.parse(result.buffer).payload.products[0]);
       state.currentItem.male = {
+        upc: randomUPCMale,
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
       }
     }
   });
 
-  var randomUPC = upcFemale[~~(Math.random()*upcFemale.length)];
+  var randomUPCFemale = upcFemale[~~(Math.random()*upcFemale.length)];
 
-  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
+  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPCFemale,
                 bufferType: "buffer",
                 headers: {
                   'X-APP-API_KEY': config['X-APP-API_KEY'],
@@ -107,6 +122,7 @@ var determineNextItem = function(){
       console.error(error);
     } else {
       state.currentItem.female = {
+        upc: randomUPCFemale,
         link: JSON.parse(result.buffer).payload.products[0].images[0].url,
         title: JSON.parse(result.buffer).payload.products[0].productTitle
       }
