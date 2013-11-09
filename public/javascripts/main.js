@@ -48,12 +48,14 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   var service = {};
 
   service.getItem = function() {
+    console.log("Sending request for item.");
     var d = $q.defer();
     $http({
       url: "/getCurrentItem",
       method: "GET",
       params: {userData: userService.data}
     }).success(function (data) {
+      console.log("Retrieved data from get request!");
       d.resolve(data);
     }).error(function (err) {
       d.reject(err);
@@ -62,12 +64,29 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   };
 
   service.verify = function(guess) {
+    console.log("Sending guess.");
     var d = $q.defer();
     $http({
       url: "/guess",
       method: "POST",
       data: {userData: userService.data, guess: guess}
     }).success(function (data) {
+      console.log("Retrieved data from post request!");
+      d.resolve(data);
+    }).error(function (err) {
+      d.reject(err);
+    });
+    return d.promise;
+  };
+
+  service.getWinner = function() {
+    var d = $q.defer();
+    $http({
+      url: "/getWinners",
+      method: "GET",
+      params: {numberOfWinners: 1}
+    }).success(function (data) {
+      console.log("Retrieved data from get request!");
       d.resolve(data);
     }).error(function (err) {
       d.reject(err);
@@ -102,18 +121,19 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   reqsService.getItem().then(
     function (data) {
       console.log("retrieved items");
-      $scope.result = data;
-      $scope.result.time = 10;
+      var roundEnd = data.roundEnd;
+      $scope.item = data.item;
+      $scope.time = 1000*(roundEnd - new Date());
 
       var countdown = setInterval(function() {
-        $scope.result.time--;
+        $scope.time--;
       }, 1000);
 
       setTimeout(function() {
         resultService.last({correct: false});
         clearInterval(countdown);
         $location.path('/result');
-      }, 1000 * $scope.result.time + 500);
+      }, 1000 * $scope.time + 500);
     },
     function (err) {
       console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
@@ -128,7 +148,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       reqsService.verify($scope.guess).then(
         function (data) {
           if (data.correct) {
-            console.log('HOLY SHIT I WON')
+            console.log('HOLY SHIT I WON');
             resultService.last(data);
             $location.path('/result');
           } else {
@@ -147,6 +167,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 .controller("resultController", function(reqsService, resultService, $location, $scope) {
   $scope.result = resultService.last();
+  $scope.winner = reqsService.getWinner();
   $scope.result.time = 10;
 
   $scope.playAgain = function() {
