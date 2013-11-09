@@ -3,8 +3,15 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   .when('/', {controller: "landingController", templateUrl: "templates/landing.html"})
   .when('/howToPlay', {controller: "howToPlayController", templateUrl: "templates/howToPlay.html"})
   .when('/hunt', {controller: "huntController", templateUrl: "templates/hunt.html"})
-  .when('/result', {controller: "resultController", templateUrl: "templates/result.html"});
+  .when('/result', {controller: "resultController", templateUrl: "templates/result.html"})
+  .when('/waiting', {controller: "waitingController", templateUrl: "templates/waiting.html"});
 })
+
+.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
+  }
+])
 
 .directive('ngEnter', function() {
   return function(scope, element, attrs) {
@@ -23,7 +30,9 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 .factory('userService', function() {
   var service = {};
 
-  service.data = {};
+  service.data = {
+    zipCode: ""
+  };
 
   return service;
 })
@@ -32,28 +41,29 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   var service = {};
 
   service.lastResult = {};
+  service.times = {};
 
   service.last = function (value) {
     if (value) {
-      return service.lastResult;
-    } else {
       service.lastResult = value;
+    } else {
+      return service.lastResult;
     }
   };
 
   service.nextRound = function (value) {
     if (value) {
-      return service.nextRound;
+      service.times.nextRound = value;
     } else {
-      service.nextRound = value;
+      return service.times.nextRound;
     }
   };
 
   service.roundEnd = function (value) {
     if (value) {
-      return service.roundEnd;
+      service.times.roundEnd = value;
     } else {
-      service.roundEnd = value;
+      return service.times.roundEnd;
     }
   };
 
@@ -65,14 +75,12 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   var service = {};
 
   service.getItem = function() {
-    console.log("Sending request for item.");
     var d = $q.defer();
     $http({
       url: "/getCurrentItem",
       method: "GET",
       params: {userData: userService.data}
     }).success(function (data) {
-      console.log("Retrieved data from get request!");
       d.resolve(data);
     }).error(function (err) {
       d.reject(err);
@@ -101,7 +109,6 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       method: "GET",
       params: {numberOfWinners: 1}
     }).success(function (data) {
-      console.log("Got number of winners: ", data);
       d.resolve(data[0]);
     }).error(function (err) {
       d.reject(err);
@@ -112,9 +119,24 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   return service;
 })
 
-.controller("landingController", function(userService, $location, $scope) {
+.controller("landingController", function(userService, $location, $scope, $http) {
+
+  var getZip = function(cb){
+    var lng, lat;
+    navigator.geolocation.getCurrentPosition(
+    function showPosition(position){
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=true_or_false')
+        .success(function(data) {
+          console.log("Zip code downloaded.");
+          cb(data);
+      });
+    });
+  };
 
   $scope.login = function() {
+    getZip(function (zip) { userService.data.zipCode = zip; });
     userService.data.gender = (Math.random() < 0.5 ? "male" : "female");
     userService.data.name = (userService.data.gender === "female" ? "Betsy" : "Johnson");
     userService.data.age = (Math.floor(Math.random()*80));
@@ -135,25 +157,24 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   reqsService.getItem().then(
     function (data) {
-      storageService.roundEnd(data.roundEnd);
-      storageService.nextRound(data.nextRound);
+      storageService.roundEnd(new Date(data.roundEnd));
+      storageService.nextRound(new Date(data.nextRound));
+      console.log ("Now: " + new Date()/1000 + ", roundEnd: " + storageService.roundEnd()/1000 + ", nextRound: " + storageService.nextRound()/1000);
+
       $scope.item = data.item;
-      $scope.time = Math.floor((new Date() - storageService.roundEnd())/1000);
+      $scope.time = Math.floor((storageService.roundEnd() - new Date())/1000);
 
       var countdown = setInterval(function() {
         $scope.$apply(function() {
-          console.log("tick! ", $scope.time);
-          $scope.time--;
+          if ($scope.time > 0) {
+            $scope.time--;
+          } else {
+            storageService.last({correct: false});
+            clearInterval(countdown);
+            $location.path('/result');
+          }
         });
       }, 1000);
-
-      setTimeout(function() {
-        $scope.$apply(function() {
-          storageService.last({correct: false});
-          clearInterval(countdown);
-          $location.path('/result');
-        });
-      }, 1000 * $scope.time + 500);
     },
     function (err) {
       console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
@@ -187,27 +208,41 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 .controller("resultController", function(reqsService, storageService, $location, $scope) {
   $scope.result = storageService.last();
   $scope.winner = reqsService.getWinner();
-  $scope.time = 10;
+  $scope.time = Math.floor((storageService.nextRound() - new Date())/1000);
+
+  var countdown = setInterval(function() {
+    $scope.$apply(function() {
+      if ($scope.time > 0) {
+        $scope.time--;
+      } else {
+        clearInterval(countdown);
+        $scope.nextRoundStarted = true;
+      }
+    });
+  }, 1000);
 
   $scope.playAgain = function() {
-    $location.path('/hunt');
+    if ($scope.time > 0) {
+      $location.path('/waiting');
+    } else {
+      $location.path('/hunt');
+    }
   };
+})
+
+.controller("waitingController", function(storageService, $location, $scope) {
+  $scope.time = Math.floor((storageService.nextRound() - new Date())/1000);
+  var countdown = setInterval(function() {
+  $scope.$apply(function() {
+    if ($scope.time > 0) {
+      $scope.time--;
+    } else {
+      clearInterval(countdown);
+      $location.path("/hunt");
+    }
+  });
+}, 1000);
 });
-
-
-
-var getZip = function(){
-  var lng, lat;
-  navigator.geolocation.getCurrentPosition(
-    function showPosition(position){
-      lat = position.coords.latitude;
-      lng = position.coords.longitude;
-      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=true_or_false')
-        .success(function(data) {
-          console.log(data);
-      })
-    })
-};
 
 
 

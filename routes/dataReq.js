@@ -6,6 +6,7 @@ var startOfRound;
 /////Game Config
 var roundLength = 10000;
 var restLength = 5000;
+var startOfRound = null;
 
 var state = {
   'currentItem': {
@@ -38,6 +39,7 @@ exports.getCurrentItem = function(req, res){
     nextRound: startOfRound + roundLength + restLength,
     item: (req.query.userData.gender === "male" ? state.currentItem.male : state.currentItem.female)
   };
+  console.log("roundEnd: " + data.roundEnd/1000 + "  nextRound" + data.nextRound/1000);
   res.end(JSON.stringify(data));
 };
 
@@ -127,7 +129,7 @@ var determineNextItem = function(){
 
 
 var eventLoop = function(){
-  startOfRound = new Date();
+  startOfRound = new Date() + 0;
   state.currentWinner.male = null;
   state.currentWinner.female = null;
   determineNextItem();

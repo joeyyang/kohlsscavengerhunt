@@ -11,8 +11,9 @@
 
 <p ng-hide="result.correct">Find an item within two minutes to win your coupon code</p>
 
-<p>The next round begins in:</p>
-<p>{{result.time}}</p>
+<p ng-hide="nextRoundStarted">The next round begins in:</p>
+<p ng-show="nextRoundStarted">The next round has already started!</p>
+<p ng-hide="nextRoundStarted">{{time}}</p>
 
 <p>Play again?</p>
 <button ng-click="playAgain()">Yes!</button>
