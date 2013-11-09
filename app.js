@@ -8,7 +8,7 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-var dataReq = require('./routes/dataReq')
+var dataReq = require('./routes/dataReq');
 var querystring = require('querystring');
 
 var app = express();
@@ -30,8 +30,11 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
-app.get('/api', dataReq.doGet);
+app.get('/getCurrentItem', dataReq.getCurrentItem);
+
+
+
+
 
 
 
