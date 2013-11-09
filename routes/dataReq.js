@@ -43,10 +43,6 @@ exports.getCurrentItem = function(req, res){
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
-  console.log('-------',req.body.userData)
-  console.log('-------',req.body.userData.gender)
-  console.log('-------',req.body.userData.name)
-  console.log('-------',req.body.guess)
   var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name);
   sendBack.endOfRound = startOfRound + roundLength;
   res.end(JSON.stringify(sendBack));  
