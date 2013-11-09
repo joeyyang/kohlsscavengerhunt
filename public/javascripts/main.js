@@ -32,16 +32,15 @@ var renderHowToPlay = function() {
   var template = Handlebars.compile(source);
   $('#container').html(template());
   $('button').click(function() {
-    $.get("/getCurrentItem?gender=" + (Math.random() < 0.5 ? "male" : "female"), renderHunt);
+    $.get("http://localhost:3000/getCurrentItem?gender=" + (Math.random() < 0.5 ? "male" : "female"),null,renderHunt);
   });
 };
 
 var renderHunt = function(data) {
-  data.time = 10;
+  data = JSON.parse(data);
   var source = $("#hunt_template").html();
   var template = Handlebars.compile(source);
 
-  var target = targets[Math.floor(Math.random()*5)];
   var time = 5;
 
   var j_input = $('input');
