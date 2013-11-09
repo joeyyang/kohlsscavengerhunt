@@ -41,6 +41,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     }
   };
 
+  return service;
 })
 
 .factory('reqsService', function($q, $http, userService) {
@@ -121,9 +122,11 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   reqsService.getItem().then(
     function (data) {
       console.log("retrieved items");
-      var roundEnd = data.roundEnd;
+      var roundEnd = new Date(data.roundEnd);
       $scope.item = data.item;
-      $scope.time = 1000*(roundEnd - new Date());
+      $scope.time = Math.floor((new Date() - roundEnd)/1000);
+
+      console.log (roundEnd, $scope.time);
 
       var countdown = setInterval(function() {
         $scope.time--;
