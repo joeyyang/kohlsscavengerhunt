@@ -32,16 +32,20 @@ exports.getWinners = function(req, res){
 };
 
 exports.getCurrentItem = function(req, res){
+  res.writeHead(200);
   if (req.query.userData.gender === "male"){
-    res.writeHead(200);
-    res.end(JSON.stringify(state.currentItem.male));
-  } else if (req.query.userData.gender === "female"){
-    res.writeHead(200);
-    res.end(JSON.stringify(state.currentItem.female));
+    var data = JSON.stringify({
+      item : state.currentItem.male,
+      roundEnd : startOfRound + roundLength
+    });
+    res.end(data);
   } else{
-    res.writeHead(200);
-    res.end(JSON.stringify(state.currentItem.male));
-  }
+    var data = JSON.stringify({
+      item : state.currentItem.female,
+      roundEnd : startOfRound + roundLength
+    });
+    res.end(data);
+  } 
 };
 
 exports.checkCurrentItem = function(req, res){
@@ -134,7 +138,7 @@ var eventLoop = function(){
   startOfRound = new Date();
   state.currentWinner.male = null;
   state.currentWinner.female = null;
-  currentItem = determineNextItem(); 
+  determineNextItem(); 
   setTimeout(eventLoop, roundLength);
 };
 
