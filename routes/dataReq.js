@@ -26,7 +26,7 @@ exports.getCurrentItem = function(req, res){
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
-  var received = req.data;
+  var received = req.body;
   var sendBack = checkWinner(received.userData.gender, received.guess);
   leaderBoard(received.userData.name, time, state.currentItem.male)
   res.end(JSON.stringify(sendBack));  
