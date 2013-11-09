@@ -1,6 +1,8 @@
-
 var httpGet = require('http-get');
 var config = require('../config');
+var leaderboard = require('../controllers/leaderboard');
+var time = new Date();
+
 var state = {
   'currentItem': {
     'male': 0,
@@ -26,6 +28,7 @@ exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
   var received = req.data;
   var sendBack = checkWinner(received.userData.gender, received.guess);
+  leaderBoard(received.userData.name, time, state.currentItem.male)
   res.end(JSON.stringify(sendBack));  
 };
 
