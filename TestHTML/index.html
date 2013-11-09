@@ -2,32 +2,33 @@
 <html>
   <head>
     <title>Kohl's Scavenger Hunt</title>
-    <link rel="stylesheet" href="../public/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
   <body>
     <header>
       <img src="logo_header.jpg" class="logo">
-      <!-- <img src="stash.jpg" class="stash"> -->
+      <img src="stash.jpg" class="stash">
     </header>
     <div id="container">
     </div>
 
 
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
 
     <script id="hunt_template" type="text/x-handlebars-template">
       <p>{{target}}</p>
       <img src='{{img_link}}'>
 
       <p>Time left:</p>
-      <p>{{time}}</p>
+      <p id='time'></p>
 
-      <input type='text' placeholder="Enter product code here..."/>
+      <input type='text' placeholder="Enter product code here..."/><br>
       <button>Found it!</button>
     </script>
 
     <script id="result_template" type="text/x-handlebars-template">
-      <p class="winner_other">The winner is {{winner}}!</p>
-      <p class="winner_you hidden">You win!!!</p>
+      <p class="winner">The winner is {{winner}}!</p>
 
       <p class="victory">You got {{place}} out of {{total_players}} players.</p>
       <p class="defeat">Better luck next time!</p>
@@ -39,7 +40,7 @@
       <p class="defeat">Find an item within two minutes to win your coupon code</p>
 
       <p>The next round begins in:</p>
-      <p>{{time}}</p>
+      <p id='time'></p>
 
       <p>Play again?</p>
       <button>Yes!</button>
