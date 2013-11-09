@@ -43,12 +43,28 @@ exports.getCurrentItem = function(req, res){
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
-  var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name);
-  res.end(JSON.stringify(sendBack));
+  httpGet.get({
+    url: 'http://qe11-openapi.kohlsecommerce.com/v1/recommendation?type=toptrending',
+    bufferType: "buffer",
+    postalCode: '' + req.body.userData.zipCode,
+    headers: {
+      'X-APP-API_KEY': config['X-APP-API_KEY'],
+      'Accept': 'application/json'
+    },
+    }, function(error, result) {
+      if (error) {
+        console.error(error);
+      } else {
+        var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name, JSON.parse(result.buffer).payload.recommendations);
+        sendBack.endOfRound = startOfRound + roundLength;
+        res.end(JSON.stringify(sendBack));  
+      }
+    }
+  );
 };
 
 
-var checkWinner = function(gender, guess, name) {
+var checkWinner = function(gender, guess, name, related) {
   var sendBack = {};
   console.log(state.currentItem[gender].upc);
   if (parseInt(guess) === state.currentItem[gender].upc) {
@@ -57,6 +73,7 @@ var checkWinner = function(gender, guess, name) {
     sendBack.place = [2, 20];                 // hardcoded
     sendBack.couponCode = "youwin";           // hardcoded
     leaderboard.addWinner(name, new Date() - startOfRound, gender);
+    sendBack.related = related;
   } else {
     sendBack.correct = false;
     sendBack.winner = state.currentWinner[gender];
