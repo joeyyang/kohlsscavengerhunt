@@ -1,0 +1,601 @@
+body {
+  background-color: #121212;
+  background-image: none;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333;
+  font-size: 12px;
+  line-height: 20px;
+}
+h1 {
+  display: inline-block;
+  margin: 140px 0px 11px;
+  padding: 9px 13px;
+  background-color: rgba(0, 0, 0, 0);
+  font-family:'PT Serif', serif;
+  color: white;
+  font-size: 38px;
+  line-height: 44px;
+  font-weight: 700;
+  text-align: left;
+}
+h2 {
+  display: inline-block;
+  margin: 254px 0px 10px;
+  padding: 9px 13px;
+  background-color: rgba(0, 0, 0, 0.49);
+  color: white;
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 700;
+}
+h3 {
+  margin-right: 0px;
+  margin-left: 0px;
+  padding-bottom: 12px;
+  background-color: rgba(0, 0, 0, 0);
+  font-family:'PT Serif', serif;
+  color: white;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+}
+h4 {
+  margin-right: 0px;
+  margin-bottom: 6px;
+  margin-left: 0px;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: none;
+  -webkit-transition: none;
+  -o-transition: none;
+  transition: none;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+  text-shadow: none;
+}
+h5 {
+  margin-right: 0px;
+  margin-left: 0px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+}
+h6 {
+  margin: 10px 0px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+p {
+  margin-bottom: 15px;
+  color: white;
+  font-size: 14px;
+}
+.button {
+  display: inline-block;
+  margin-top: 190px;
+  padding: 12px 31px;
+  border: 2px solid white;
+  border-radius: 5px;
+  background-color: #121212;
+  background-image: none;
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+  font-family:'PT Serif', serif;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+}
+.button:hover {
+  background-color: rgba(123, 192, 65, 0.90);
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+}
+.section {
+  padding-top: 43px;
+  padding-bottom: 43px;
+}
+.section.header {
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  z-index: 1;
+  height: auto;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  background-color: #333;
+  background-image: none;
+}
+.section.grey {
+  background-color: #f2f2f2;
+}
+.nav-link {
+  margin-right: 5px;
+  margin-left: 5px;
+  padding: 10px 14px;
+  border-radius: 5px;
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  text-transform: none;
+}
+.nav-link:hover {
+  background-color: #969696;
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+}
+.nav-link.sign-up {
+  background-color: #008cff;
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+}
+.nav-link:hover.sign-up:hover {
+  background-color: #0076d6;
+}
+.company-title {
+  color: white;
+  font-size: 20px;
+  font-weight: 400;
+  text-transform: none;
+}
+.nav-bar {
+  padding-right: 0px;
+  padding-left: 0px;
+  border-bottom: 2px none white;
+  background-color: rgba(0, 0, 0, 0);
+  text-align: right;
+}
+.hero-bg {
+  width: auto;
+  padding-top: 33px;
+  padding-bottom: 33px;
+  background-image: url(../images/example-bg.png);
+}
+.subtitle {
+  margin-bottom: 18px;
+  -webkit-transform: none;
+  -ms-transform: none;
+  -o-transform: none;
+  transform: none;
+  -webkit-transition: none;
+  -o-transition: none;
+  transition: none;
+  color: rgba(0, 0, 0, 0.56);
+  font-size: 16px;
+  font-weight: 700;
+}
+.section-description {
+  font-size: 14px;
+}
+.snippet {
+  display: block;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  -webkit-transform: none;
+  -ms-transform: none;
+  -o-transform: none;
+  transform: none;
+  -webkit-transition: none;
+  -o-transition: none;
+  transition: none;
+  color: black;
+  text-decoration: none;
+}
+.snippet:hover {
+  -webkit-transform: none;
+  -ms-transform: none;
+  -o-transform: none;
+  transform: none;
+}
+.right-col {
+  padding-top: 13px;
+  text-align: right;
+}
+.more-link {
+  padding: 6px 8px;
+  border: 2px solid #c2c2c2;
+  border-radius: 5px;
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+  color: #9c9c9c;
+  font-size: 14px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.more-link:hover {
+  border: 1px solid #008cff;
+  background-color: #008cff;
+  -webkit-transition: all 200ms ease;
+  -o-transition: all 200ms ease;
+  transition: all 200ms ease;
+  color: white;
+}
+.snippet-text-section {
+  padding: 10px 12px;
+}
+.snippet-title {
+  margin-bottom: 7px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.snippet-text {
+  color: #737373;
+  font-size: 14px;
+  line-height: 19px;
+}
+.snippet-row {
+  margin-top: 27px;
+  margin-bottom: 27px;
+}
+.button-column {
+  padding-top: 32px;
+  text-align: center;
+}
+.company-column {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+.img-example {
+  margin-bottom: 34px;
+}
+.footer-link {
+  margin-right: 9px;
+  margin-left: 9px;
+  color: #008cff;
+  font-size: 14px;
+  text-decoration: none;
+}
+.footer-nav-bar {
+  text-align: right;
+}
+.footer-text {
+  font-size: 14px;
+}
+.content-bg {
+  padding-top: 39px;
+  padding-bottom: 39px;
+  background-color: lightgrey;
+  background-image: none;
+}
+.content-bg.two {
+  background-image: url(../images/example-bg.png);
+}
+.example-image {
+  width: 100%;
+}
+.hero {
+  background-image: none;
+}
+.container {
+  height: 800px;
+  background-image: none;
+}
+.header {
+  height: 900px;
+  margin-top: 0px;
+  padding-top: 74px;
+  background-image: url(../images/adjusted_7.jpg);
+  background-size: cover;
+  background-repeat: no-repeat no-repeat;
+  text-align: center;
+}
+.login {
+  text-align: center;
+}
+.logo {
+  margin-top: 0px;
+  float: none;
+  background-image: none;
+}
+.hunt-logo {
+  float: left;
+  border: 2px solid white;
+}
+.hunt-stash {
+  padding: 7px 8px 4px;
+  float: right;
+  border-style: none none solid;
+  border-color: white;
+  border-bottom-width: 2px;
+  font-family:'PT Serif', serif;
+  color: white;
+  font-size: 17px;
+  text-align: center;
+  text-decoration: none;
+}
+.hunt-body {
+  background-color: #121212;
+  text-align: center;
+}
+.hunt-timer {
+  margin-top: 11px;
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+}
+.hunt-item {
+  background-color: rgba(0, 0, 0, 0);
+}
+.hunt-input {
+  background-color: #121212;
+}
+.hunt-form {
+  padding-top: 20px;
+  padding-right: 30px;
+  padding-left: 30px;
+  background-color: rgba(0, 0, 0, 0);
+  font-family:'PT Serif', serif;
+  color: white;
+}
+.hunt-input-submit {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 2px solid white;
+  border-radius: 1px;
+  background-color: #4da355;
+  font-size: 16px;
+}
+@media (max-width: 991px) {
+  h1 {
+    margin-top: 67px;
+  }
+  .button {
+    margin-top: 100px;
+    border-radius: 1px;
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+    font-size: 16px;
+  }
+  .button:hover {
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .section.header {
+    background-image: url(../images/adjusted_7.jpg);
+  }
+  .nav-link {
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .hero-bg {
+    background-image: url(../images/example-bg.png);
+  }
+  .snippet {
+    -webkit-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+  }
+  .content-bg {
+    background-image: url(../images/example-bg.png);
+  }
+  .content-bg.two {
+    background-image: url(../images/example-bg.png);
+  }
+  .hero {
+    background-image: url(../images/Contemporary-Minimalist-Bathroom-Interior-with-Simple-Bathup-Design-and-Toilets.jpg);
+    background-position: -312px 0%;
+  }
+  .header {
+    height: 500px;
+    padding-top: 63px;
+    background-image: url(../images/adjusted_7.jpg);
+    background-position: 0px 85%;
+    background-size: cover;
+  }
+}
+@media (max-width: 767px) {
+  h1 {
+    margin-top: -10px;
+    font-size: 36px;
+  }
+  h2 {
+    margin-top: 107px;
+  }
+  h3 {
+    display: block;
+  }
+  .button {
+    margin-top: 121px;
+    margin-bottom: 33px;
+    padding: 16px 24px;
+    border-radius: 1px;
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .button:hover {
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .section.header {
+    background-color: #333;
+  }
+  .nav-link {
+    background-color: #6b6b6b;
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .nav-link:hover {
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .company-title {
+    margin-bottom: 33px;
+  }
+  .nav-bar {
+    text-align: center;
+  }
+  .hero-bg {
+    padding-right: 10px;
+    padding-left: 10px;
+    background-image: url(../images/example-bg.png);
+  }
+  .snippet {
+    margin-bottom: 19px;
+  }
+  .right-col {
+    margin-top: -42px;
+  }
+  .button-column {
+    padding-top: 61px;
+  }
+  .company-column {
+    text-align: center;
+  }
+  .footer-nav-bar {
+    text-align: center;
+  }
+  .left-footer-col {
+    margin-bottom: 13px;
+    text-align: center;
+  }
+  .content-bg {
+    padding-right: 10px;
+    padding-left: 10px;
+    background-image: url(../images/example-bg.png);
+  }
+  .container {
+    height: auto;
+    background-image: none;
+  }
+  .header {
+    height: 227px;
+    padding-top: 19px;
+    background-image: url(../images/adjusted_landscape.jpg);
+    background-position: 0px 92%;
+    background-size: cover;
+  }
+  .login {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+  }
+  .logo {
+    margin-left: 21px;
+    padding-left: 0px;
+    float: left;
+  }
+}
+@media (max-width: 479px) {
+  body {
+    background-color: #121212;
+    color: black;
+  }
+  h1 {
+    margin-top: 67px;
+    box-shadow: none;
+    font-size: 35px;
+    text-align: center;
+    text-indent: 0px;
+    text-shadow: black 0px -1px 0px;
+  }
+  h3 {
+    margin-bottom: 0px;
+    color: white;
+  }
+  p {
+    display: block;
+  }
+  .button {
+    margin-top: 78px;
+    padding: 20px 40px;
+    border-style: solid;
+    border-radius: 1px;
+    background-color: #121212;
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+    font-family:'PT Serif', serif;
+  }
+  .button:hover {
+    background-color: rgba(123, 192, 65, 0.90);
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .button:active {
+    background-color: rgba(122, 191, 65, 0.90);
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .button:focus {
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .section.header {
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    background-image: none;
+  }
+  .nav-link {
+    display: block;
+    margin-bottom: 19px;
+    -webkit-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  .hero-bg {
+    background-image: url(../images/example-bg.png);
+  }
+  .section-description {
+    width: 50%;
+  }
+  .content-bg {
+    min-height: 330px;
+    background-image: url(../images/example-bg.png);
+  }
+  .hero {
+    background-color: rgba(0, 0, 0, 0.85);
+    background-image: url(../images/janesville-mall-20.jpg);
+    background-position: -450px 56%;
+  }
+  .container {
+    height: 355px;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: none;
+  }
+  .header {
+    height: 358px;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url(../images/adjusted_7.jpg);
+    background-size: cover;
+  }
+  .logo {
+    margin-top: 0px;
+    padding-top: 15px;
+    background-image: none;
+    opacity: 1;
+  }
+  .hunt-logo {
+    float: left;
+  }
+  .hunt-body {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  .hunt-timer {
+    color: white;
+    text-shadow: black 0px -1px 0px;
+  }
+  .hunt-item {
+    background-color: rgba(77, 176, 109, 0);
+  }
+}
