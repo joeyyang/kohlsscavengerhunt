@@ -33,26 +33,17 @@ exports.getWinners = function(req, res){
 
 exports.getCurrentItem = function(req, res){
   res.writeHead(200);
-  if (req.query.userData.gender === "male"){
-    var data = JSON.stringify({
-      item : state.currentItem.male,
-      roundEnd : startOfRound + roundLength
-    });
-    res.end(data);
-  } else {
-    var data = JSON.stringify({
-      item : state.currentItem.female,
-      roundEnd : startOfRound + roundLength
-    });
-    res.end(data);
-  }
+  var data = {
+    roundEnd: startOfRound + roundLength,
+    nextRound: startOfRound + roundLength + restLength,
+    item: (req.query.userData.gender === "male" ? state.currentItem.male : state.currentItem.female)
+  };
+  res.end(JSON.stringify(data));
 };
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
   var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name);
-  sendBack.roundEnd = startOfRound + roundLength;
-  sendBack.nextRound = startOfRound + roundLength + restLength;
   res.end(JSON.stringify(sendBack));
 };
 
