@@ -1,113 +1,156 @@
-var formatTime = function (seconds) {
-  var mins = ("0" + Math.floor(seconds/60)).slice(-2);
-  var secs = ("0" + seconds % 60).slice(-2);
-  return mins + ":" + secs;
-};
+var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $locationProvider) {
+  $routeProvider
+  .when('/', {controller: "landingController", templateUrl: "templates/landing.html"})
+  .when('/howToPlay', {controller: "howToPlayController", templateUrl: "templates/howToPlay.html"})
+  .when('/hunt', {controller: "huntController", templateUrl: "templates/hunt.html"})
+  .when('/result', {controller: "resultController", templateUrl: "templates/result.html"});
+})
 
-var onEnterOrClick = function(enterTarget, clickTarget, callback) {
-  var args = Array.prototype.slice.call(arguments, 3);
-  enterTarget.on('keyUp', function (e) {
-    if (e.keyCode == 13) {
-      callback.apply(this, args);
-    }
-  });
-  clickTarget.click(function() {
-    callback.apply(this, args);
-  });
-};
+.directive('ngEnter', function() {
+  return function(scope, element, attrs) {
+    element.bind("keydown keypress", function(event) {
+      if(event.which === 13) {
+        scope.$apply(function(){
+          scope.$eval(attrs.ngEnter);
+        });
 
-var renderLanding = function() {
-  var source = $("#landing_template").html();
-  var template = Handlebars.compile(source);
-  $('header').hide();
-  $('#container').html(template());
-  $('button').click(function() {
-    $('header').show();
-    renderHowToPlay();
-  });
-};
-
-var renderHowToPlay = function() {
-  var source = $("#howToPlay_template").html();
-  var template = Handlebars.compile(source);
-  $('#container').html(template());
-  $('button').click(function() {
-    $.get("http://localhost:3000/getCurrentItem?gender=" + (Math.random() < 0.5 ? "male" : "female"),null,renderHunt);
-  });
-};
-
-var renderHunt = function(data) {
-  data = JSON.parse(data);
-  var source = $("#hunt_template").html();
-  var template = Handlebars.compile(source);
-
-  var time = 5;
-
-  var j_input = $('input');
-  var j_button = $('button');
-  var j_error = $('#error');
-  var j_time = $('#time');
-
-  $('#container').html(template(data));
-
-  j_error.hide();
-  j_time.text(formatTime(time));
-
-  onEnterOrClick(j_input, j_button, function(guess, error) {
-    $.post('/guess', {guess: j_input.val()}, function (correct) {
-
+        event.preventDefault();
+      }
     });
-    j_input.val('');
-  });
+  };
+})
 
-  var countdown = setInterval(function() {
-    time--;
-    if (time === 0) {
-      clearInterval(countdown);
-      renderResult(false);
+.factory('userService', function() {
+  var service = {};
+
+  service.data = {};
+
+  return service;
+})
+
+.factory('resultService', function() {
+  var service = {};
+
+  service.lastResult = {};
+
+  service.last = function (value) {
+    if (value) {
+      return service.lastResult;
     } else {
-      j_time.text(formatTime(time));
+      service.lastResult = value;
     }
-  }, 1000);
-};
+  };
 
-var renderResult = function(win) {
-  var source = $("#result_template").html();
-  var template = Handlebars.compile(source);
+})
 
-  var time = 5;
+.factory('reqsService', function($q, $http, userService) {
 
-  $('#container').html(template({
-    winner: 'James Bond',
-    place: 6,
-    total_players:392,
-    code: 'XLZ4KF'
-  }));
+  var service = {};
 
-  $('#time').text(formatTime(time));
+  service.getItem = function() {
+    var d = $q.defer();
+    $http({
+      url: "/getCurrentItem",
+      method: "GET",
+      params: {userData: userService.data}
+    }).success(function (data) {
+      d.resolve(data);
+    }).error(function (err) {
+      d.reject(err);
+    });
+    return d.promise;
+  };
 
-  if (win) {
-    $('.defeat').hide();
-  } else {
-    $('.victory').hide();
-  }
+  service.verify = function(guess) {
+    var d = $q.defer();
+    $http({
+      url: "/guess",
+      method: "POST",
+      data: {userData: userService.data, guess: guess}
+    }).success(function (data) {
+      d.resolve(data);
+    }).error(function (err) {
+      d.reject(err);
+    });
+    return d.promise;
+  };
 
-  $('button').click(function() {
-    clearInterval(countdown);
-    renderHunt();
-  });
+  return service;
+})
 
-  var countdown = setInterval(function() {
-    time--;
-    if (time === 0) {
-      clearInterval(countdown);
-      $.get("/getCurrentItem?gender=" + (Math.random() < 0.5 ? "male" : "female"), renderHunt);
-    } else {
-      $('#time').text(formatTime(time));
+.controller("landingController", function(userService, $location, $scope) {
+
+  $scope.login = function() {
+    userService.data.gender = (Math.random() < 0.5 ? "male" : "female");
+    userService.data.name = (userService.data.gender === "female" ? "Betsy" : "Johnson");
+    userService.data.age = (Math.floor(Math.random()*80));
+    $location.path('/howToPlay');
+  };
+
+})
+
+.controller("howToPlayController", function($location, $scope) {
+
+  $scope.play = function() {
+    $location.path('/hunt');
+  };
+
+})
+
+.controller("huntController", function(reqsService, resultService, $location, $scope) {
+
+  reqsService.getItem().then(
+    function (data) {
+      console.log("retrieved items");
+      $scope.result = data;
+      $scope.result.time = 10;
+
+      var countdown = setInterval(function() {
+        $scope.result.time--;
+      }, 1000);
+
+      setTimeout(function() {
+        resultService.last({correct: false});
+        clearInterval(countdown);
+        $location.path('/result');
+      }, 1000 * $scope.result.time + 500);
+    },
+    function (err) {
+      console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
     }
-  }, 1000);
-};
+  );
 
-$(document).on('ready', function(){
-  renderLanding();
+  $scope.error = false;
+
+
+  $scope.verify = function() {
+    if ($scope.guess) {
+      reqsService.verify($scope.guess).then(
+        function (data) {
+          if (data.correct) {
+            resultService.last(data);
+            $location.path('/result');
+          } else {
+            $scope.error = true;
+          }
+        },
+        function (err) {
+          console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
+        }
+      );
+      $scope.guess = "";
+    }
+  };
+
+})
+
+.controller("resultController", function(reqsService, resultService, $location, $scope) {
+  $scope.result = resultService.last();
+  $scope.result.time = 10;
+
+  $scope.playAgain = function() {
+    $location.path('/hunt');
+  };
 });
+
+

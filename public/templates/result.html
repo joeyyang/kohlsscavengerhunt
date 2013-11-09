@@ -1,0 +1,16 @@
+<p>The winner is {{result.winner}}!</p>
+
+<p ng-show="result.correct">You got {{result.place[0]}} out of {{result.place[1]}} players.</p>
+<p ng-hide="result.correct">Better luck next time!</p>
+
+<p ng-show="result.correct">Your coupon code is:</p>
+<p ng-show="result.correct">{{result.couponCode}}</p>
+<p ng-show="result.correct">Save to my stash!</p>
+
+<p ng-hide="result.correct">Find an item within two minutes to win your coupon code</p>
+
+<p>The next round begins in:</p>
+<p>{{result.time}}</p>
+
+<p>Play again?</p>
+<button ng-click="playAgain()">Yes!</button>
