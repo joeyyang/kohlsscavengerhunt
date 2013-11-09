@@ -39,7 +39,6 @@ exports.getCurrentItem = function(req, res){
     nextRound: startOfRound + roundLength + restLength,
     item: (req.query.userData.gender === "male" ? state.currentItem.male : state.currentItem.female)
   };
-  console.log("roundEnd: " + data.roundEnd/1000 + "  nextRound" + data.nextRound/1000);
   res.end(JSON.stringify(data));
 };
 
@@ -129,7 +128,7 @@ var determineNextItem = function(){
 
 
 var eventLoop = function(){
-  startOfRound = new Date() + 0;
+  startOfRound = (new Date())/1;
   state.currentWinner.male = null;
   state.currentWinner.female = null;
   determineNextItem();
