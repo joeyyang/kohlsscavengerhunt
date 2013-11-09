@@ -31,8 +31,14 @@ exports.getCurrentItem = function(req, res){
 
 exports.checkCurrentItem = function(req, res){
   res.writeHead(200);
+<<<<<<< HEAD
   var sendBack = checkWinner(req.data.userData.gender, req.data.guess, req.data.UserData.name);
   sendBack.timeLeft = startOfRound + roundLength;
+=======
+  var received = req.body;
+  var sendBack = checkWinner(received.userData.gender, received.guess);
+  leaderBoard(received.userData.name, time, state.currentItem.male)
+>>>>>>> master
   res.end(JSON.stringify(sendBack));  
 };
 
