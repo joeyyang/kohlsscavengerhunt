@@ -1,14 +1,7 @@
-var targets = ['Camel', 'Dog', 'Llama', 'Gnu', 'Yak'];
-
 var formatTime = function (seconds) {
   var mins = ("0" + Math.floor(seconds/60)).slice(-2);
   var secs = ("0" + seconds % 60).slice(-2);
   return mins + ":" + secs;
-};
-
-var verify = function (guess) {
-  if (guess.toLowerCase() === "llama") return true;
-  return false;
 };
 
 var onEnterOrClick = function(enterTarget, clickTarget, callback) {
@@ -39,32 +32,33 @@ var renderHowToPlay = function() {
   var template = Handlebars.compile(source);
   $('#container').html(template());
   $('button').click(function() {
-    renderHunt();
+    $.get("/getCurrentItem?gender=" + (Math.random() < 0.5 ? "male" : "female"), renderHunt);
   });
 };
 
-var renderHunt = function() {
+var renderHunt = function(data) {
+  data.time = 10;
   var source = $("#hunt_template").html();
   var template = Handlebars.compile(source);
 
   var target = targets[Math.floor(Math.random()*5)];
   var time = 5;
 
-  $('#container').html(template({
-    target: target,
-    img_link: "images/" + target + ".jpg"
-  }));
+  var j_input = $('input');
+  var j_button = $('button');
+  var j_error = $('#error');
+  var j_time = $('#time');
 
-  $('#error').hide();
-  $('#time').text(formatTime(time));
+  $('#container').html(template(data));
 
-  onEnterOrClick($('input'), $('button'), function(guess, error) {
-    if (verify($('input').val())) {
-      clearInterval(countdown);
-      renderResult(true);
-    } else {
-      $('#error').show();
-    }
+  j_error.hide();
+  j_time.text(formatTime(time));
+
+  onEnterOrClick(j_input, j_button, function(guess, error) {
+    $.post('/guess', {guess: j_input.val()}, function (correct) {
+
+    });
+    j_input.val('');
   });
 
   var countdown = setInterval(function() {
@@ -73,7 +67,7 @@ var renderHunt = function() {
       clearInterval(countdown);
       renderResult(false);
     } else {
-      $('#time').text(formatTime(time));
+      j_time.text(formatTime(time));
     }
   }, 1000);
 };
@@ -108,7 +102,7 @@ var renderResult = function(win) {
     time--;
     if (time === 0) {
       clearInterval(countdown);
-      renderHunt();
+      $.get("/getCurrentItem?gender=" + (Math.random() < 0.5 ? "male" : "female"), renderHunt);
     } else {
       $('#time').text(formatTime(time));
     }
