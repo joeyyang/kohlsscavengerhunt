@@ -3,8 +3,15 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   .when('/', {controller: "landingController", templateUrl: "templates/landing.html"})
   .when('/howToPlay', {controller: "howToPlayController", templateUrl: "templates/howToPlay.html"})
   .when('/hunt', {controller: "huntController", templateUrl: "templates/hunt.html"})
-  .when('/result', {controller: "resultController", templateUrl: "templates/result.html"});
+  .when('/result', {controller: "resultController", templateUrl: "templates/result.html"})
+  .when('/waiting', {controller: "waitingController", templateUrl: "templates/waiting.html"});
 })
+
+.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
+  }
+])
 
 .directive('ngEnter', function() {
   return function(scope, element, attrs) {
@@ -23,25 +30,20 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 .factory('userService', function() {
   var service = {};
 
-  service.data = {};
+  service.data = {
+    zipCode: ""
+  };
 
   return service;
 })
 
-.factory('resultService', function() {
-  var service = {};
-
-  service.lastResult = {};
-
-  service.last = function (value) {
-    if (value) {
-      return service.lastResult;
-    } else {
-      service.lastResult = value;
-    }
+.factory('storageService', function() {
+  return {
+    success: false,
+    coupon: "",
+    roundEnd: 0,
+    nextRound: 0
   };
-
-  return service;
 })
 
 .factory('reqsService', function($q, $http, userService) {
@@ -49,14 +51,12 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   var service = {};
 
   service.getItem = function() {
-    console.log("Sending request for item.");
     var d = $q.defer();
     $http({
       url: "/getCurrentItem",
       method: "GET",
       params: {userData: userService.data}
     }).success(function (data) {
-      console.log("Retrieved data from get request!");
       d.resolve(data);
     }).error(function (err) {
       d.reject(err);
@@ -64,30 +64,12 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     return d.promise;
   };
 
-  service.verify = function(guess) {
-    console.log("Sending guess.");
+  service.getRoundData = function() {
     var d = $q.defer();
     $http({
-      url: "/guess",
-      method: "POST",
-      data: {userData: userService.data, guess: guess}
+      url: "/getRoundData",
+      method: "GET"
     }).success(function (data) {
-      console.log("Retrieved data from post request!");
-      d.resolve(data);
-    }).error(function (err) {
-      d.reject(err);
-    });
-    return d.promise;
-  };
-
-  service.getWinner = function() {
-    var d = $q.defer();
-    $http({
-      url: "/getWinners",
-      method: "GET",
-      params: {numberOfWinners: 1}
-    }).success(function (data) {
-      console.log("Retrieved data from get request!");
       d.resolve(data);
     }).error(function (err) {
       d.reject(err);
@@ -98,9 +80,24 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   return service;
 })
 
-.controller("landingController", function(userService, $location, $scope) {
+.controller("landingController", function(userService, $location, $scope, $http) {
+
+  var getZip = function(cb){
+    var lng, lat;
+    navigator.geolocation.getCurrentPosition(
+    function showPosition(position){
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=true_or_false')
+        .success(function(data) {
+          console.log("Zip code downloaded.");
+          cb(data);
+      });
+    });
+  };
 
   $scope.login = function() {
+    getZip(function (zip) { userService.data.zipCode = zip; });
     userService.data.gender = (Math.random() < 0.5 ? "male" : "female");
     userService.data.name = (userService.data.gender === "female" ? "Betsy" : "Johnson");
     userService.data.age = (Math.floor(Math.random()*80));
@@ -117,26 +114,29 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 })
 
-.controller("huntController", function(reqsService, resultService, $location, $scope) {
+.controller("huntController", function(reqsService, storageService, $location, $scope) {
 
   reqsService.getItem().then(
     function (data) {
-      console.log("retrieved items");
-      var roundEnd = new Date(data.roundEnd);
+      storageService.roundEnd = new Date(data.roundEnd);
+      storageService.nextRound = new Date(data.nextRound);
+      storageService.coupon = data.item.coupon;
+      console.log(storageService);
       $scope.item = data.item;
-      $scope.time = Math.floor((new Date() - roundEnd)/1000);
-
-      console.log (roundEnd, $scope.time);
+      console.log(data.item);
+      $scope.time = Math.floor((storageService.roundEnd - new Date())/1000);
 
       var countdown = setInterval(function() {
-        $scope.time--;
+        $scope.$apply(function() {
+          if ($scope.time > 0) {
+            $scope.time--;
+          } else {
+            storageService.success = false;
+            clearInterval(countdown);
+            $location.path('/result');
+          }
+        });
       }, 1000);
-
-      setTimeout(function() {
-        resultService.last({correct: false});
-        clearInterval(countdown);
-        $location.path('/result');
-      }, 1000 * $scope.time + 500);
     },
     function (err) {
       console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
@@ -147,56 +147,66 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 
   $scope.verify = function() {
-    if ($scope.guess) {
-      reqsService.verify($scope.guess).then(
-        function (data) {
-          if (data.correct) {
-            console.log('HOLY SHIT I WON');
-            resultService.last(data);
-            $location.path('/result');
-          } else {
-            $scope.error = true;
-          }
-        },
-        function (err) {
-          console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
-        }
-      );
+    if ($scope.guess){
+      if($scope.guess === $scope.item.upc.toString()) {
+          storageService.success = true;
+          $location.path('/result');
+      } else {
+        $scope.error = true;
+      }
       $scope.guess = "";
     }
   };
 
 })
 
-.controller("resultController", function(reqsService, resultService, $location, $scope) {
-  $scope.result = resultService.last();
-  $scope.winner = reqsService.getWinner();
-  $scope.result.time = 10;
+.controller("resultController", function(reqsService, storageService, $location, $scope) {
+  reqsService.getRoundData().then(
+    function (data){
+      $scope.result = data;
+    },
+    function (err) {
+      $scope.result = {
+        winner: unknown,
+        place: ['?', '?']
+      };
+    }
+  );
+
+  $scope.coupon = storageService.coupon;
+  $scope.success = storageService.success;
+  $scope.time = Math.floor((storageService.nextRound - new Date())/1000);
+
+  var countdown = setInterval(function() {
+    $scope.$apply(function() {
+      if ($scope.time > 0) {
+        $scope.time--;
+      } else {
+        clearInterval(countdown);
+        $scope.nextRoundStarted = true;
+      }
+    });
+  }, 1000);
 
   $scope.playAgain = function() {
-    $location.path('/hunt');
+    if ($scope.time > 0) {
+      $location.path('/waiting');
+    } else {
+      $location.path('/hunt');
+    }
   };
+})
+
+.controller("waitingController", function(storageService, $location, $scope) {
+  $scope.time = Math.floor((storageService.nextRound - new Date())/1000);
+  var countdown = setInterval(function() {
+    $scope.$apply(function() {
+      if ($scope.time > 0) {
+        $scope.time--;
+      } else {
+        clearInterval(countdown);
+        $location.path("/hunt");
+      }
+    });
+  }, 1000);
 });
-
-
-
-var getZip = function(){
-  var lng, lat;
-  navigator.geolocation.getCurrentPosition(
-    function showPosition(position){
-      lat = position.coords.latitude;
-      lng = position.coords.longitude;
-      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=true_or_false')
-        .success(function(data) {
-          console.log(data);
-      })
-    })
-};
-
-
-
-
-
-
-
-
