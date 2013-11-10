@@ -160,7 +160,6 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       console.log(data.item.upc);
       seconds = Math.floor((roundEnd - new Date())/1000);
       $scope.time = timeService.formatTime(seconds);
-      if (seconds < 3) $location.path('/waiting');
 
       countdown = setInterval(function() {
         $scope.$apply(function() {
