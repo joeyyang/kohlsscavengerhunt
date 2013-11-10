@@ -249,7 +249,11 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   $scope.playAgain = function() {
     if (seconds > 0) {
-      $location.path('/waiting');
+      $scope.waiting = true;
+      setTimeout(function(){
+        $location.path('/hunt');
+        $scope.waiting = false;
+      }, seconds*1000);
     } else {
       $location.path('/hunt');
     }
