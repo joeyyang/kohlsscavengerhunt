@@ -87,6 +87,7 @@ p {
   color: white;
   text-align: center;
   text-decoration: none;
+  cursor: pointer;
 }
 .button:hover {
   background-color: #4da355;
