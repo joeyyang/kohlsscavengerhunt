@@ -56,6 +56,7 @@ var hashString = function(str){
 
 var determineNextItem = function(){
   var randomUPC = UPCList[~~(Math.random()*UPCList.length)];
+  console.log('Picking a random UPC for next round.  UPC:', randomUPC);
   var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
                 bufferType: "buffer",
                 headers: {
@@ -68,10 +69,11 @@ var determineNextItem = function(){
       console.error(error);
     } else {
       var product = JSON.parse(result.buffer).payload.products[0];
+      console.log('Name of random item picked:', product.productTitle);
       state.currentItem = {
         upc: randomUPC,
         link: product.images[0].url,
-        title: product.productTitle.replace('&nbsp', ' ').replace('&reg', ''),
+        title: product.productTitle,
         coupon: hashString(product.productTitle).slice(0,8)
       };
     }
@@ -79,7 +81,7 @@ var determineNextItem = function(){
 };
 
 var loadItems = function(){
-  //this will get hte top 99 most popular items.
+  console.log('Gathering big list of items from recommendation API');
   httpGet.get({
     url: 'http://qe11-openapi.kohlsecommerce.com/v1/recommendation?type=toptrending&limit=99',
     bufferType: "buffer",
@@ -93,6 +95,7 @@ var loadItems = function(){
         console.error(error);
       } else {
         webStoreItems = JSON.parse(result.buffer).payload.recommendations[0].products;
+        console.log('Have pulled items from recommendation API.  Num items:', webStoreItems.length);
         grabUPCs();
       }
     }
@@ -113,7 +116,11 @@ var grabUPCs = function(){
           console.error(error);
         } else {
           UPCList.push(JSON.parse(result.buffer).payload.products[0].SKUS[0].UPC.ID);
-          if (UPCList.length === 20) eventLoop();
+          console.log('UPC loaded');
+          if (UPCList.length === 20){
+            console.log('starting next round');
+            eventLoop();
+          }
         }
       }
     );
@@ -121,6 +128,8 @@ var grabUPCs = function(){
 };
 
 var eventLoop = function(){
+  console.log('--------------------')
+  console.log('Starting a new round')
   startOfRound = (new Date())/1;
   state.currentWinner = null;
   leaderboard.newRound();
