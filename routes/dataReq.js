@@ -10,13 +10,8 @@ var startOfRound = null;
 
 // Storage
 var UPCList = [];
-var state = {
-  'currentItem': {
-      link: null,
-      title: null,
-      upc: null
-  }
-};
+var state = {};
+var nextItemState = {};
 
 exports.getCurrentItem = function(req, res){
   leaderboard.addPlayer();
@@ -70,7 +65,7 @@ var determineNextItem = function(){
     } else {
       var product = JSON.parse(result.buffer).payload.products[0];
       console.log('Name of random item picked:', product.productTitle);
-      state.currentItem = {
+      nextItemState.currentItem = { //state.currentItem = {
         upc: randomUPC,
         link: product.images[0].url,
         title: product.productTitle,
@@ -133,6 +128,7 @@ var eventLoop = function(){
   startOfRound = (new Date())/1;
   state.currentWinner = null;
   leaderboard.newRound();
+  state = nextItemState;
   determineNextItem();
   setTimeout(eventLoop, roundLength + restLength);
 };
