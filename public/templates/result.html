@@ -21,6 +21,7 @@
       <p ng-hide="nextRoundStarted" class="p-result">The next round begins in {{time}}.</p>
       <p ng-show="nextRoundStarted" class="p-result">The next round has started!</p>
         <p class="p-result">Play again?</p>
-    </div><a class="button result-submit hunt-input-submit result-yes" ng-click="playAgain()">Yes!</a>
+    </div><a class="button result-submit hunt-input-submit result-yes" ng-hide='waiting' ng-click="playAgain()">Yes!</a>
+    </div><a class="button result-submit hunt-input-submit result-yes" ng-show='waiting' ng-click="playAgain()">Waiting...</a>
   </div>
 </div>
