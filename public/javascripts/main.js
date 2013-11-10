@@ -103,6 +103,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 .controller("landingController", function(userService, $location, $scope, $http) {
 
+  $scope.needsLogin = false;
+
   var getZip = function(cb){
     var lng, lat;
     navigator.geolocation.getCurrentPosition(
@@ -117,20 +119,28 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     });
   };
 
+  var auth = new FirebaseSimpleLogin(userService.firebase, function(error, user) {
+    if (error) {
+      console.log("OMG ABORT ABORT WHY DID I DO THAT???: " + error);
+    } else if (user) {
+      userService.data = user;
+      // extend standard Facebook data object with zipCode of user
+      getZip(function (zip) { userService.data.zipCode = zip; });
+      userService.data.age = (Math.floor(Math.random()*80));
+      $location.path('/howToPlay');
+    } else {
+      console.log ("not logged in");
+      $scope.$apply(function() {
+        $scope.needsLogin = true;
+      });
+    }
+  });
+
+  window.logout = function() {
+    auth.logout();
+  };
+
   $scope.login = function() {
-    var auth = new FirebaseSimpleLogin(userService.firebase, function(error, user) {
-      if (error) {
-        console.log("OMG ABORT ABORT WHY DID I DO THAT???: " + error);
-      } else if (user) {
-        userService.data = user;
-        // extend standard Facebook data object with zipCode of user
-        getZip(function (zip) { userService.data.zipCode = zip; });
-        userService.data.age = (Math.floor(Math.random()*80));
-        $location.path('/howToPlay');
-      } else {
-        $location.path('/');
-      }
-    });
     auth.login('facebook');
   };
 
