@@ -1,19 +1,25 @@
-<p ng-show="result.winner">The winner is {{result.winner}}!</p>
-<p ng-hide="result.winner">No one won this round!</p>
-
-
-<p ng-show="success">You got {{result.place[0]}} out of {{result.place[1]}} players.</p>
-<p ng-hide="success">Better luck next time!</p>
-
-<p ng-show="success">Your coupon code is:</p>
-<p ng-show="success">{{coupon}}</p>
-<p ng-show="success">Save to my stash!</p>
-
-<p ng-hide="success">Find an item within two minutes to win your coupon code</p>
-
-<p ng-hide="nextRoundStarted">The next round begins in:</p>
-<p ng-show="nextRoundStarted">The next round has already started!</p>
-<p ng-hide="nextRoundStarted">{{time}}</p>
-
-<p>Play again?</p>
-<button ng-click="playAgain()">Yes!</button>
+<div class="w-clearfix nav-bar"><a class="hunt-stash" href="#">My Rewards</a>
+  <img class="hunt-logo" src="images/kohls_logo_good4.jpg" width="145" alt="kohls_logo_good4.jpg">
+</div>
+<div class="hunt-body result-body">
+  <div>
+    <h1 ng-show="success" class="h1-result">Congratulations!</h1>
+    <p ng-show="success" class="p-result">You came in {{result.place[0]}} out of {{result.place[1]}} players.</p>
+    <h1 ng-hide="success" class="h1-result">Womp Womp.</h1>
+    <p ng-hide="success" class="p-result">You're out of time!</p>
+    <div ng-show="success">
+      <p class="p-result">Your rewards code is:
+        <br>
+        <br>{{coupon}}
+      </p>
+      <a class="button result-submit hunt-input-submit result-save" href="#">Save to My Rewards</a>
+    </div>
+  </div>
+  <div>
+    <div class="play-again-result">
+      <p ng-hide="nextRoundStarted" class="p-result">The next round begins in {{time}}</p>
+      <p ng-show="nextRoundStarted" class="p-result">The next round has started</p>
+        <p class="p-result">Play again?</p>
+    </div><a class="button result-submit hunt-input-submit result-yes" href="#">Yes!</a>
+  </div>
+</div>
