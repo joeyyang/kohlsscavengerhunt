@@ -4,8 +4,8 @@ var leaderboard = require('../controllers/leaderBoard');
 var startOfRound;
 
 /////Game Config
-var roundLength = 10000;
-var restLength = 5000;
+var roundLength = 20000;
+var restLength = 7000;
 var startOfRound = null;
 
 var state = {
@@ -17,9 +17,20 @@ var state = {
   'currentWinner': null
 };
 
-exports.getWinners = function(req, res){
+exports.getWinners = function(req, res) {
   res.writeHead(200);
   res.end(JSON.stringify(leaderboard.getWinners(req.query.numberOfWinners)));
+};
+
+exports.getRoundData = function(req, res){
+  res.writeHead(200);
+  var data = {
+    // winner: leaderboard.getWinners(1)[0],
+    winner: "James Bond",
+    place: [3, 25]
+  };
+  console.log(data);
+  res.end(JSON.stringify(data));
 };
 
 exports.getCurrentItem = function(req, res){
@@ -32,44 +43,15 @@ exports.getCurrentItem = function(req, res){
   res.end(JSON.stringify(data));
 };
 
-exports.checkCurrentItem = function(req, res){
-  res.writeHead(200);
-  httpGet.get({
-    url: 'http://qe11-openapi.kohlsecommerce.com/v1/recommendation?type=toptrending',
-    bufferType: "buffer",
-    postalCode: '' + req.body.userData.zipCode,
-    headers: {
-      'X-APP-API_KEY': config['X-APP-API_KEY'],
-      'Accept': 'application/json'
-    },
-    }, function(error, result) {
-      if (error) {
-        console.error(error);
-      } else {
-        var sendBack = checkWinner(req.body.userData.gender, req.body.guess, req.body.userData.name, JSON.parse(result.buffer).payload.recommendations);
-        sendBack.endOfRound = startOfRound + roundLength;
-        res.end(JSON.stringify(sendBack));
-      }
+var hashString = function(str){
+    var hash = 0, i, char;
+    if (str.length == 0) return hash;
+    for (i = 0, l = str.length; i < l; i++) {
+        char  = str.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+char;
+        hash |= 0; // Convert to 32bit integer
     }
-  );
-};
-
-
-var checkWinner = function(gender, guess, name, related) {
-  var sendBack = {};
-  console.log(state.currentItem.upc);
-  if (parseInt(guess) === state.currentItem.upc) {
-    sendBack.correct = true;
-    sendBack.place = [2, 20];                 // hardcoded
-    sendBack.couponCode = "youwin";           // hardcoded
-    leaderboard.addWinner(name, new Date() - startOfRound);
-    sendBack.related = related;
-  } else {
-    sendBack.correct = false;
-    sendBack.winner = state.currentWinner;
-  }
-  console.log(sendBack);
-  return sendBack;
+    return hash.toString().slice(1, 7);
 };
 
 var determineNextItem = function(){
@@ -93,10 +75,12 @@ var determineNextItem = function(){
       console.error(error);
     } else {
       // console.log(JSON.parse(result.buffer).payload.products[0]);
+      var product = JSON.parse(result.buffer).payload.products[0];
       state.currentItem = {
         upc: randomUPC,
-        link: JSON.parse(result.buffer).payload.products[0].images[0].url,
-        title: JSON.parse(result.buffer).payload.products[0].productTitle
+        link: product.images[0].url,
+        title: product.productTitle,
+        coupon: hashString(product.productTitle).slice(0,8)
       };
     }
   });

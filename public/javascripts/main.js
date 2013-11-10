@@ -38,36 +38,12 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 })
 
 .factory('storageService', function() {
-  var service = {};
-
-  service.lastResult = {};
-  service.times = {};
-
-  service.last = function (value) {
-    if (value) {
-      service.lastResult = value;
-    } else {
-      return service.lastResult;
-    }
+  return {
+    success: false,
+    coupon: "",
+    roundEnd: 0,
+    nextRound: 0
   };
-
-  service.nextRound = function (value) {
-    if (value) {
-      service.times.nextRound = value;
-    } else {
-      return service.times.nextRound;
-    }
-  };
-
-  service.roundEnd = function (value) {
-    if (value) {
-      service.times.roundEnd = value;
-    } else {
-      return service.times.roundEnd;
-    }
-  };
-
-  return service;
 })
 
 .factory('reqsService', function($q, $http, userService) {
@@ -88,28 +64,13 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     return d.promise;
   };
 
-  service.verify = function(guess) {
+  service.getRoundData = function() {
     var d = $q.defer();
     $http({
-      url: "/guess",
-      method: "POST",
-      data: {userData: userService.data, guess: guess}
+      url: "/getRoundData",
+      method: "GET"
     }).success(function (data) {
       d.resolve(data);
-    }).error(function (err) {
-      d.reject(err);
-    });
-    return d.promise;
-  };
-
-  service.getWinner = function() {
-    var d = $q.defer();
-    $http({
-      url: "/getWinners",
-      method: "GET",
-      params: {numberOfWinners: 1}
-    }).success(function (data) {
-      d.resolve(data[0]);
     }).error(function (err) {
       d.reject(err);
     });
@@ -157,19 +118,20 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   reqsService.getItem().then(
     function (data) {
-      storageService.roundEnd(new Date(data.roundEnd));
-      storageService.nextRound(new Date(data.nextRound));
-      console.log ("Now: " + new Date()/1000 + ", roundEnd: " + storageService.roundEnd()/1000 + ", nextRound: " + storageService.nextRound()/1000);
-
+      storageService.roundEnd = new Date(data.roundEnd);
+      storageService.nextRound = new Date(data.nextRound);
+      storageService.coupon = data.item.coupon;
+      console.log(storageService);
       $scope.item = data.item;
-      $scope.time = Math.floor((storageService.roundEnd() - new Date())/1000);
+      console.log(data.item);
+      $scope.time = Math.floor((storageService.roundEnd - new Date())/1000);
 
       var countdown = setInterval(function() {
         $scope.$apply(function() {
           if ($scope.time > 0) {
             $scope.time--;
           } else {
-            storageService.last({correct: false});
+            storageService.success = false;
             clearInterval(countdown);
             $location.path('/result');
           }
@@ -185,20 +147,13 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 
   $scope.verify = function() {
-    if ($scope.guess) {
-      reqsService.verify($scope.guess).then(
-        function (data) {
-          if (data.correct) {
-            storageService.last(data);
-            $location.path('/result');
-          } else {
-            $scope.error = true;
-          }
-        },
-        function (err) {
-          console.log("ERROR ERROR FAIL FAIL PANIC: " + err);
-        }
-      );
+    if ($scope.guess){
+      if($scope.guess === $scope.item.upc.toString()) {
+          storageService.success = true;
+          $location.path('/result');
+      } else {
+        $scope.error = true;
+      }
       $scope.guess = "";
     }
   };
@@ -206,9 +161,21 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 })
 
 .controller("resultController", function(reqsService, storageService, $location, $scope) {
-  $scope.result = storageService.last();
-  $scope.winner = reqsService.getWinner();
-  $scope.time = Math.floor((storageService.nextRound() - new Date())/1000);
+  reqsService.getRoundData().then(
+    function (data){
+      $scope.result = data;
+    },
+    function (err) {
+      $scope.result = {
+        winner: unknown,
+        place: ['?', '?']
+      };
+    }
+  );
+
+  $scope.coupon = storageService.coupon;
+  $scope.success = storageService.success;
+  $scope.time = Math.floor((storageService.nextRound - new Date())/1000);
 
   var countdown = setInterval(function() {
     $scope.$apply(function() {
@@ -231,23 +198,15 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 })
 
 .controller("waitingController", function(storageService, $location, $scope) {
-  $scope.time = Math.floor((storageService.nextRound() - new Date())/1000);
+  $scope.time = Math.floor((storageService.nextRound - new Date())/1000);
   var countdown = setInterval(function() {
-  $scope.$apply(function() {
-    if ($scope.time > 0) {
-      $scope.time--;
-    } else {
-      clearInterval(countdown);
-      $location.path("/hunt");
-    }
-  });
-}, 1000);
+    $scope.$apply(function() {
+      if ($scope.time > 0) {
+        $scope.time--;
+      } else {
+        clearInterval(countdown);
+        $location.path("/hunt");
+      }
+    });
+  }, 1000);
 });
-
-
-
-
-
-
-
-

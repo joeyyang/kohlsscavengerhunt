@@ -28,8 +28,9 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/getCurrentItem', dataReq.getCurrentItem);
-app.post('/guess', dataReq.checkCurrentItem);
+app.get('/getRoundData', dataReq.getRoundData);
 app.get('/getWinners', dataReq.getWinners);
+
 
 
 http.createServer(app).listen(app.get('port'), function(){

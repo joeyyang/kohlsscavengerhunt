@@ -1,15 +1,15 @@
-<p ng-show="winner">The winner is {{winner}}!</p>
-<p ng-hide="winner">No one won this round!</p>
+<p ng-show="result.winner">The winner is {{result.winner}}!</p>
+<p ng-hide="result.winner">No one won this round!</p>
 
 
-<p ng-show="result.correct">You got {{result.place[0]}} out of {{result.place[1]}} players.</p>
-<p ng-hide="result.correct">Better luck next time!</p>
+<p ng-show="success">You got {{result.place[0]}} out of {{result.place[1]}} players.</p>
+<p ng-hide="success">Better luck next time!</p>
 
-<p ng-show="result.correct">Your coupon code is:</p>
-<p ng-show="result.correct">{{result.couponCode}}</p>
-<p ng-show="result.correct">Save to my stash!</p>
+<p ng-show="success">Your coupon code is:</p>
+<p ng-show="success">{{coupon}}</p>
+<p ng-show="success">Save to my stash!</p>
 
-<p ng-hide="result.correct">Find an item within two minutes to win your coupon code</p>
+<p ng-hide="success">Find an item within two minutes to win your coupon code</p>
 
 <p ng-hide="nextRoundStarted">The next round begins in:</p>
 <p ng-show="nextRoundStarted">The next round has already started!</p>
