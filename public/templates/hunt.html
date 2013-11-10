@@ -1,15 +1,3 @@
-<!-- 
-<p>{{item.title}}</p>
-<img src='{{item.link}}'>
-<p>Time left:</p>
-<p>{{time}}</p>
-
-<input type='text' ng-enter="verify()" ng-model="guess" placeholder="Enter product code here..."/><br>
-<button ng-click="verify()">Found it!</button>
-<p ng-show="error">Sorry, keep looking!</p> -->
-
-<!-- =========================================================================================== -->
-
 <div class="w-clearfix nav-bar"><a class="hunt-stash" href="#/stash">My Rewards</a>
   <a href="http://www.kohls.com"><img class="hunt-logo" src="images/kohls_logo_good4.jpg" width="145" alt="kohls"></a>
 </div>
@@ -22,15 +10,14 @@
   <div class="hunt-input">
     <div class="w-form">
       <form class="hunt-form" name="email-form" data-name="Email Form">
-        <input class="w-input hunt-input-text" type="text" ng-enter="verify()" ng-model="guess" placeholder="Enter UPC code  here!" name="upc" data-name="upc"></input>
+        <input class="w-input hunt-input-text" type="text" ng-enter="verify()" ng-model="guess" placeholder="Enter product code here..." name="upc" data-name="upc"></input>
         <button ng-click="verify()" class="w-button hunt-input-submit" data-wait="Please wait...">Found it!</button>
       </form>
       <div class="w-form-done">
         <p>Thank you! Your submission has been received!</p>
       </div>
-      <!-- GB: CHANGE CLASS ON NEXT LINE. -->
       <div ng-show="error" class="w-form-fail">
-        <p>Oops! Something went wrong. :(</p>
+        <p>{{error}}</p>
       </div>
     </div>
   </div>

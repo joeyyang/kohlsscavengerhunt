@@ -4,7 +4,7 @@ var leaderboard = require('../controllers/leaderBoard');
 var analytics = require('../controllers/analytics');
 
 /////Game Config
-var roundLength = 12000;
+var roundLength = 25000;
 var restLength = 6000;
 var startOfRound = null;
 

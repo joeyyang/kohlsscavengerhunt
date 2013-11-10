@@ -40,6 +40,7 @@ h3 {
   font-weight: 700;
 }
 h4 {
+  color: white;
   margin-right: 0px;
   margin-bottom: 6px;
   margin-left: 0px;
@@ -402,6 +403,11 @@ li {
   border-radius: 1px;
   background-color: #4da355;
   font-size: 16px;
+}
+.w-form-fail {
+  color:white;
+  display:block;
+  background-color: transparent;
 }
 .hunt-input-submit.result-submit {
   -webkit-transition: all 200ms ease;

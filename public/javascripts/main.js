@@ -55,7 +55,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   var service = {};
 
   service.formatTime = function (seconds) {
-    var m = ("0" + (~~(seconds/60)).toString()).slice(-2);
+    var m = ("" + (~~(seconds/60)).toString()).slice(-1);
     var s = ("0" + (seconds % 60).toString()).slice(-2);
     return m + ":" + s;
   };
@@ -103,6 +103,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 .controller("landingController", function(userService, $location, $scope, $http) {
 
+  $scope.needsLogin = false;
+
   var getZip = function(cb){
     var lng, lat;
     navigator.geolocation.getCurrentPosition(
@@ -117,20 +119,28 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     });
   };
 
+  var auth = new FirebaseSimpleLogin(userService.firebase, function(error, user) {
+    if (error) {
+      console.log("OMG ABORT ABORT WHY DID I DO THAT???: " + error);
+    } else if (user) {
+      userService.data = user;
+      // extend standard Facebook data object with zipCode of user
+      getZip(function (zip) { userService.data.zipCode = zip; });
+      userService.data.age = (Math.floor(Math.random()*80));
+      $location.path('/howToPlay');
+    } else {
+      console.log ("not logged in");
+      $scope.$apply(function() {
+        $scope.needsLogin = true;
+      });
+    }
+  });
+
+  window.logout = function() {
+    auth.logout();
+  };
+
   $scope.login = function() {
-    var auth = new FirebaseSimpleLogin(userService.firebase, function(error, user) {
-      if (error) {
-        console.log("OMG ABORT ABORT WHY DID I DO THAT???: " + error);
-      } else if (user) {
-        userService.data = user;
-        // extend standard Facebook data object with zipCode of user
-        getZip(function (zip) { userService.data.zipCode = zip; });
-        userService.data.age = (Math.floor(Math.random()*80));
-        $location.path('/howToPlay');
-      } else {
-        $location.path('/');
-      }
-    });
     auth.login('facebook');
   };
 
@@ -156,15 +166,17 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       roundEnd = new Date(data.roundEnd);
 
       // Hack to display item titles correctly.
-      var div = document.createElement('div');
-      div.innerHTML = data.item.title;
-      data.item.title = div.childNodes[0].nodeValue;
+      if (data.item.title) {
+        var div = document.createElement('div');
+        div.innerHTML = data.item.title;
+        data.item.title = div.childNodes[0].nodeValue;
+      }
 
       storageService.nextRound = new Date(data.nextRound);
       storageService.item = data.item;
       $scope.item = data.item;
-      console.log(data.item.upc);
-      seconds = Math.floor((roundEnd - new Date())/1000);
+      console.log(data.item.upc.slice(-6,-1));
+      seconds = Math.max(0, Math.floor((roundEnd - new Date())/1000));
       $scope.time = timeService.formatTime(seconds);
 
       countdown = setInterval(function() {
@@ -190,12 +202,18 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   $scope.verify = function() {
     if ($scope.guess){
-      if($scope.guess === $scope.item.upc.toString()) {
-          storageService.success = true;
-          clearInterval(countdown);
-          $location.path('/result');
+      if ($scope.guess.length === 5) {
+        if($scope.guess === $scope.item.upc.toString().slice(-6,-1)) {
+            storageService.success = true;
+            clearInterval(countdown);
+            $location.path('/result');
+        } else {
+          console.log("wrong guess.");
+          $scope.error = "Sorry, that's not correct. Keep looking!";
+        }
       } else {
-        $scope.error = true;
+        console.log("product key not 5 digits");
+        $scope.error = "Please enter the five-digit product code!";
       }
       $scope.guess = "";
     }
@@ -225,7 +243,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   $scope.coupon = storageService.item.coupon;
   $scope.success = storageService.success;
-  var seconds = Math.floor((storageService.nextRound - new Date())/1000);
+  var seconds = Math.max(0, Math.floor((storageService.nextRound - new Date())/1000));
   $scope.time = timeService.formatTime(seconds);
 
   var countdown = setInterval(function() {
@@ -261,22 +279,6 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       $location.path('/hunt');
     }
   };
-})
-
-.controller("waitingController", function(timeService, storageService, $location, $scope) {
-  var seconds = Math.floor((storageService.nextRound - new Date())/1000);
-  $scope.time = timeService.formatTime(seconds);
-  var countdown = setInterval(function() {
-    $scope.$apply(function() {
-      if (seconds > 0) {
-        seconds--;
-        $scope.time = timeService.formatTime(seconds);
-      } else {
-        clearInterval(countdown);
-        $location.path("/hunt");
-      }
-    });
-  }, 1000);
 })
 
 .controller("stashController", function($location, $scope, storageService) {
