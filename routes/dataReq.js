@@ -34,6 +34,7 @@ exports.getRoundData = function(req, res){
   res.writeHead(200);
   var place = leaderboard.results(JSON.parse(req.query.userData));
   if (place[0] > place[1]) place[0] = place[1]; // Bugfix.
+  place[0] = getOrdinal(place[0]);
   var data = {
     place: place
   };
@@ -127,6 +128,12 @@ var grabUPCs = function(){
     );
   }
 };
+
+var getOrdinal = function(n) {
+   var s=["th","st","nd","rd"],
+       v=n%100;
+   return n+(s[(v-20)%10]||s[v]||s[0]);
+}
 
 var eventLoop = function(){
   console.log('--------------------');
