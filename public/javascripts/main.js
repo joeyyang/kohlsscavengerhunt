@@ -4,6 +4,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   .when('/howToPlay', {controller: "howToPlayController", templateUrl: "templates/howToPlay.html"})
   .when('/hunt', {controller: "huntController", templateUrl: "templates/hunt.html"})
   .when('/result', {controller: "resultController", templateUrl: "templates/result.html"})
+  .when('/stash', {controller: "stashController", templateUrl: "templates/stash.html"})
   .when('/waiting', {controller: "waitingController", templateUrl: "templates/waiting.html"});
 })
 
@@ -43,9 +44,10 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   return {
     success: false,
     coupon: "",
+    itemTitle: "",
     roundEnd: 0,
     nextRound: 0,
-    coupons: []
+    coupons: {}
   };
 })
 
@@ -150,6 +152,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       storageService.roundEnd = new Date(data.roundEnd);
       storageService.nextRound = new Date(data.nextRound);
       storageService.coupon = data.item.coupon;
+      storageService.itemTitle = data.item.title;
       $scope.item = data.item;
       console.log(data.item.upc);
       seconds = Math.floor((storageService.roundEnd - new Date())/1000);
@@ -204,6 +207,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     }
   );
 
+  $scope.saved = !!storageService.coupons[storageService.itemTitle];
+
   $scope.coupon = storageService.coupon;
   $scope.success = storageService.success;
   var seconds = Math.floor((storageService.nextRound - new Date())/1000);
@@ -223,9 +228,9 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   $scope.toggleCoupon = function() {
     if ($scope.saved) {
-      storageService.coupons.pop($scope.coupon);
+      delete storageService.coupons[storageService.itemTitle];
     } else {
-      storageService.coupons.push($scope.coupon);
+      storageService.coupons[storageService.itemTitle] = storageService.coupon;
     }
     $scope.saved = !$scope.saved;
     console.log(storageService.coupons);
@@ -254,4 +259,21 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       }
     });
   }, 1000);
+})
+
+.controller("stashController", function($location, $scope, storageService) {
+
+  stash = [];
+  for (var title in storageService.coupons) {
+    stash.push({title: title, coupon: storageService.coupons[title]});
+  }
+  $scope.stash = stash;
+
+  $scope.back = function() {
+    window.history.back();
+  };
 });
+
+
+
+
