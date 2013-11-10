@@ -42,6 +42,7 @@ exports.getRoundData = function(req, res){
     //user has won
     console.log('player won');
     analytics.won(currentItem);
+    analytics.played(currentItem);
   } else{
     //user did not win
     console.log('player did not won');
