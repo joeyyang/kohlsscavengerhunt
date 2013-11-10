@@ -122,10 +122,9 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       if (error) {
         console.log("OMG ABORT ABORT WHY DID I DO THAT???: " + error);
       } else if (user) {
+        userService.data = user;
+        // extend standard Facebook data object with zipCode of user
         getZip(function (zip) { userService.data.zipCode = zip; });
-        console.log(user);
-        userService.data.name = user.id;
-        userService.data.gender = (Math.random() < 0.5 ? "male" : "female");
         userService.data.age = (Math.floor(Math.random()*80));
         $location.path('/howToPlay');
       } else {
