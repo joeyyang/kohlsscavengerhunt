@@ -9,6 +9,7 @@
     "express": "3.4.3",
     "jade": "*",
     "http-get": "latest",
-    "handlebars": "*"
+    "handlebars": "*",
+    "firebase": "latest"
   }
 }
