@@ -94,6 +94,12 @@ p {
   -o-transition: all 200ms ease;
   transition: all 200ms ease;
 }
+.button:hover.button-landing:hover {
+  background-color: #4da355;
+}
+.button:hover.button-htp:hover {
+  background-color: #4da355;
+}
 .section {
   padding-top: 43px;
   padding-bottom: 43px;
@@ -348,8 +354,8 @@ p {
   background-color: #4da355;
   font-size: 16px;
 }
-.hunt-input-submit:hover.result-submit:hover {
-  background-color: #4da355;
+.hunt-input-submit.result-save {
+  background-color: #787878;
 }
 .hunt-input-text {
   display: block;
@@ -391,6 +397,12 @@ p {
     -o-transition: all 200ms ease;
     transition: all 200ms ease;
   }
+  .button:hover.button-landing:hover {
+    background-color: #4da355;
+  }
+  .button:active.button-landing:active {
+    background-color: #4da355;
+  }
   .section.header {
     background-image: url(../images/adjusted_7.jpg);
   }
@@ -428,6 +440,10 @@ p {
   .hunt-input-submit.result-submit {
     margin-top: 10px;
   }
+  .hunt-input-submit.result-save {
+    background-color: #787878;
+    color: white;
+  }
 }
 @media (max-width: 767px) {
   h1 {
@@ -455,6 +471,9 @@ p {
     -webkit-transition: all 200ms ease;
     -o-transition: all 200ms ease;
     transition: all 200ms ease;
+  }
+  .button:hover.button-landing:hover {
+    background-color: #4da355;
   }
   .section.header {
     background-color: #333;
@@ -597,6 +616,9 @@ p {
     -webkit-transition: all 200ms ease;
     -o-transition: all 200ms ease;
     transition: all 200ms ease;
+  }
+  .button:hover.button-landing:hover {
+    background-color: #4da355;
   }
   .button.button-htp {
     margin-top: 90px;
