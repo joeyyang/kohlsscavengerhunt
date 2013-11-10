@@ -22,15 +22,10 @@ exports.display = function() {
   console.log(data);
 };
 
-var pushData = function(){
-
-}
 
 exports.showData = function(req,res){
-  myRoot.push({user:'john',message:"hello world!"});
-
   res.writeHead(200);
-  res.end();
+  res.end(JSON.stringify(anal));
 }
 
 exports.won = function(item){
@@ -40,14 +35,9 @@ exports.won = function(item){
   });
 }
 
-exports.lost = function(item){
+exports.played = function(item){
   var ref = myRoot.child("plays").child(item.upc);
   ref.transaction(function(current) {
     return current + 1;
   });
 }
-
-      // upc: randomUPC,
-      //   link: product.images[0].url,
-      //   title: product.productTitle,
-      //   coupon: hashString(product.productTitle).slice(0,8)
