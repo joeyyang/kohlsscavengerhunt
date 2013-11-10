@@ -32,9 +32,8 @@ exports.getCurrentItem = function(req, res){
 
 exports.getRoundData = function(req, res){
   res.writeHead(200);
-  var results = leaderboard.results(JSON.parse(req.query.userData));
   var data = {
-    place: results.slice(1)
+    place: leaderboard.results(JSON.parse(req.query.userData))
   };
   res.end(JSON.stringify(data));
 };

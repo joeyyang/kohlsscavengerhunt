@@ -30,6 +30,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 .factory('userService', function() {
   var service = {};
 
+  // service.firebase = new Firebase("https://kohlsscavengerhunt.firebaseio.com/");
+
   service.data = {
     zipCode: ""
   };
@@ -91,14 +93,17 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       lng = position.coords.longitude;
       $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=false')
         .success(function(data) {
-          console.log("Zip code downloaded.");
-          console.log(data);
           var zip = JSON.stringify(data).match(/\"\d{5}\"/g)[0].slice(1, 6);
-          console.log("Zip: " + zip);
           cb(zip);
       });
     });
   };
+
+  // $scope.login = function() {
+  //   var auth = new FirebaseSimpleLogin(userService.firebase, function() {
+
+  //   });
+  // }
 
   $scope.login = function() {
     getZip(function (zip) { userService.data.zipCode = zip; });
