@@ -47,7 +47,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     itemTitle: "",
     roundEnd: 0,
     nextRound: 0,
-    coupons: {}
+    coupons: {},
+    resultData: null
   };
 })
 
@@ -147,17 +148,18 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   var seconds;
   var countdown;
 
+  storageService.resultData = null;
+
   reqsService.getItem().then(
     function (data) {
-      storageService.roundEnd = new Date(data.roundEnd);
+      roundEnd = new Date(data.roundEnd);
       storageService.nextRound = new Date(data.nextRound);
       storageService.coupon = data.item.coupon;
       storageService.itemTitle = data.item.title;
       $scope.item = data.item;
       console.log(data.item.upc);
-      seconds = Math.floor((storageService.roundEnd - new Date())/1000);
+      seconds = Math.floor((roundEnd - new Date())/1000);
       $scope.time = timeService.formatTime(seconds);
-      if (seconds < 3) $location.path('/waiting');
 
       countdown = setInterval(function() {
         $scope.$apply(function() {
@@ -196,16 +198,21 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 })
 
 .controller("resultController", function(timeService, reqsService, storageService, $location, $scope) {
-  reqsService.getRoundData().then(
-    function (data){
-      $scope.result = data;
-    },
-    function (err) {
-      $scope.result = {
-        place: ['?', '?']
-      };
-    }
-  );
+  if (storageService.resultData === null) {
+    reqsService.getRoundData().then(
+      function (data){
+        storageService.resultData = data;
+        $scope.result = data;
+      },
+      function (err) {
+        $scope.result = {
+          place: ['?', '?']
+        };
+      }
+    );
+  } else {
+    $scope.result = storageService.resultData;
+  }
 
   $scope.saved = !!storageService.coupons[storageService.itemTitle];
 
