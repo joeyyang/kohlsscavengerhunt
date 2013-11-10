@@ -17,11 +17,12 @@
 
   <div id="container">
     <canvas id="myChart" width="1200" height="600"></canvas>
+    <canvas id="myChart2" width="1200" height="600"></canvas>
   </div>
 
   <script>
     var ctx = $("#myChart")[0].getContext("2d");
-
+    var ctx2 = $("#myChart2")[0].getContext("2d");
     var options = {
         
       //Boolean - If we show the scale above the chart data     
@@ -118,53 +119,41 @@
       for(var key in data.plays){
         dataSets[0].data.push(data.plays[key]);
       }
-
       for(var keys in data.wins){
         dataSets[1].data.push(data.wins[keys])
       }
-    
       chartData = {
         datasets : dataSets,
         labels: Object.keys(data.plays)
       }
-      console.log(chartData);
-
-    
       var chart = new Chart(ctx).Bar(chartData, options);
     });
 
-    var doChart = function(){
-      d3.json('multiBarHorizontalData.json', function(data) {
-          nv.addGraph(function() {
-            var chart = nv.models.multiBarHorizontalChart()
-                .x(function(d) { return d.label })
-                .y(function(d) { return d.value })
-                .margin({top: 30, right: 20, bottom: 50, left: 175})
-                .showValues(true)
-               .tooltips(false)
-                .showControls(false);
-       
-           chart.yAxis
-               .tickFormat(d3.format(',.2f'));
-       
-           d3.select('#chart1 svg')
-               .datum(data)
-             .transition().duration(500)
-               .call(chart);
-       
-           nv.utils.windowResize(chart.update);
-       
-           return chart;
-         });
-       });
-    };
-
+    var chartData1;
     $.get('/showData',function(data){
       data = JSON.parse(data);
       
-      
+      var dataSets = 
+        [
+          {
+          fillColor : "rgba(220,220,220,0.5)",
+          strokeColor : "rgba(220,220,220,1)",
+          data: []
+          }
+      ]
+      for(var key in data.users){
+        dataSets[0].data.push(data.users[key]);
+      }
+
+      chartData1 = {
+        datasets : dataSets,
+        labels: Object.keys(data.users)
+      }
+      var chart = new Chart(ctx2).Bar(chartData1, options);
     });
 
+
+    
 
 
   </script>
