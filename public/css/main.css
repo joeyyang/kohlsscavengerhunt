@@ -291,10 +291,16 @@ p {
 .login {
   text-align: center;
 }
+.login.login-htp {
+  margin-top: -34px;
+}
 .logo {
   margin-top: 0px;
   float: none;
   background-image: none;
+}
+.logo.logo-htp {
+  margin-top: -15px;
 }
 .hunt-logo {
   float: left;
@@ -349,6 +355,12 @@ p {
   margin-right: auto;
   margin-left: auto;
   padding-left: 12px;
+}
+.h3-htp {
+  margin-top: 14px;
+}
+.p-htp {
+  font-family:'PT Serif', serif;
 }
 @media (max-width: 991px) {
   h1 {
@@ -493,13 +505,25 @@ p {
     margin-bottom: 0px;
     padding-bottom: 0px;
   }
+  .login.login-htp {
+    margin-top: -61px;
+  }
   .logo {
     margin-left: 21px;
     padding-left: 0px;
     float: left;
   }
+  .logo.logo-htp {
+    margin-top: 0px;
+  }
   .hunt-input-text {
     width: 70%;
+  }
+  .h3-htp {
+    margin-top: 8px;
+  }
+  .p-htp {
+    margin-top: 12px;
   }
 }
 @media (max-width: 479px) {
@@ -550,6 +574,10 @@ p {
     -o-transition: all 200ms ease;
     transition: all 200ms ease;
   }
+  .button.button-htp {
+    margin-top: 90px;
+    padding: 15px 30px;
+  }
   .section.header {
     padding-right: 16px;
     padding-bottom: 8px;
@@ -589,11 +617,19 @@ p {
     background-image: url(../images/adjusted_7.jpg);
     background-size: cover;
   }
+  .login.login-htp {
+    padding-top: 0px;
+  }
   .logo {
     margin-top: 0px;
     padding-top: 15px;
     background-image: none;
     opacity: 1;
+  }
+  .logo.logo-htp {
+    margin-top: -11px;
+    margin-left: 0px;
+    float: none;
   }
   .hunt-logo {
     float: left;
@@ -610,5 +646,8 @@ p {
   }
   .hunt-input-text {
     width: 95%;
+  }
+  .h3-htp {
+    margin-top: 15px;
   }
 }

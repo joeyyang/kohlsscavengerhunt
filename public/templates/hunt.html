@@ -14,7 +14,7 @@
   <a href="http://www.kohls.com"><img class="hunt-logo" src="images/kohls_logo_good4.jpg" width="145" alt="kohls"></a>
 </div>
 <div class="hunt-body">
-  <h1 class="hunt-timer">{{result.time}}</h1>
+  <h1 class="hunt-timer">{{time}}</h1>
   <div class="hunt-item">
     <h3>{{item.title}}</h3>
     <img src='{{item.link}}' alt='{{item.title}}'>
@@ -22,7 +22,7 @@
   <div class="hunt-input">
     <div class="w-form">
       <form class="hunt-form" name="email-form" data-name="Email Form">
-        <input class="w-input hunt-input-text" type="text" ng-enter="verify()" ng-model="guess" placeholder="Enter SKU number here!" name="sku" data-name="SKU"></input>
+        <input class="w-input hunt-input-text" type="text" ng-enter="verify()" ng-model="guess" placeholder="Enter UPC code  here!" name="upc" data-name="upc"></input>
         <button ng-click="verify()" class="w-button hunt-input-submit" data-wait="Please wait...">Found it!</button>
       </form>
       <div class="w-form-done">
