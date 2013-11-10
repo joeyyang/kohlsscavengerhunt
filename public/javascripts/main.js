@@ -44,8 +44,21 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     success: false,
     coupon: "",
     roundEnd: 0,
-    nextRound: 0
+    nextRound: 0,
+    coupons: []
   };
+})
+
+.factory('timeService', function() {
+  var service = {};
+
+  service.formatTime = function (seconds) {
+    var m = ("0" + (~~(seconds/60)).toString()).slice(-2);
+    var s = ("0" + (seconds % 60).toString()).slice(-2);
+    return m + ":" + s;
+  };
+
+  return service;
 })
 
 .factory('reqsService', function($q, $http, userService) {
@@ -127,7 +140,10 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 })
 
-.controller("huntController", function(reqsService, storageService, $location, $scope) {
+.controller("huntController", function(timeService, reqsService, storageService, $location, $scope) {
+
+  var seconds;
+  var countdown;
 
   reqsService.getItem().then(
     function (data) {
@@ -136,12 +152,15 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       storageService.coupon = data.item.coupon;
       $scope.item = data.item;
       console.log(data.item.upc);
-      $scope.time = Math.floor((storageService.roundEnd - new Date())/1000);
+      seconds = Math.floor((storageService.roundEnd - new Date())/1000);
+      $scope.time = timeService.formatTime(seconds);
+      if (seconds < 3) $location.path('/waiting');
 
-      var countdown = setInterval(function() {
+      countdown = setInterval(function() {
         $scope.$apply(function() {
-          if ($scope.time > 0) {
-            $scope.time--;
+          if (seconds > 0) {
+            seconds--;
+            $scope.time = timeService.formatTime(seconds);
           } else {
             storageService.success = false;
             clearInterval(countdown);
@@ -162,6 +181,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     if ($scope.guess){
       if($scope.guess === $scope.item.upc.toString()) {
           storageService.success = true;
+          clearInterval(countdown);
           $location.path('/result');
       } else {
         $scope.error = true;
@@ -172,7 +192,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 })
 
-.controller("resultController", function(reqsService, storageService, $location, $scope) {
+.controller("resultController", function(timeService, reqsService, storageService, $location, $scope) {
   reqsService.getRoundData().then(
     function (data){
       $scope.result = data;
@@ -186,12 +206,14 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
   $scope.coupon = storageService.coupon;
   $scope.success = storageService.success;
-  $scope.time = Math.floor((storageService.nextRound - new Date())/1000);
+  var seconds = Math.floor((storageService.nextRound - new Date())/1000);
+  $scope.time = timeService.formatTime(seconds);
 
   var countdown = setInterval(function() {
     $scope.$apply(function() {
-      if ($scope.time > 0) {
-        $scope.time--;
+      if (seconds > 0) {
+        seconds--;
+        $scope.time = timeService.formatTime(seconds);
       } else {
         clearInterval(countdown);
         $scope.nextRoundStarted = true;
@@ -199,8 +221,18 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     });
   }, 1000);
 
+  $scope.toggleCoupon = function() {
+    if ($scope.saved) {
+      storageService.coupons.pop($scope.coupon);
+    } else {
+      storageService.coupons.push($scope.coupon);
+    }
+    $scope.saved = !$scope.saved;
+    console.log(storageService.coupons);
+  };
+
   $scope.playAgain = function() {
-    if ($scope.time > 0) {
+    if (seconds > 0) {
       $location.path('/waiting');
     } else {
       $location.path('/hunt');
@@ -208,12 +240,14 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
   };
 })
 
-.controller("waitingController", function(storageService, $location, $scope) {
-  $scope.time = Math.floor((storageService.nextRound - new Date())/1000);
+.controller("waitingController", function(timeService, storageService, $location, $scope) {
+  var seconds = Math.floor((storageService.nextRound - new Date())/1000);
+  $scope.time = timeService.formatTime(seconds);
   var countdown = setInterval(function() {
     $scope.$apply(function() {
-      if ($scope.time > 0) {
-        $scope.time--;
+      if (seconds > 0) {
+        seconds--;
+        $scope.time = timeService.formatTime(seconds);
       } else {
         clearInterval(countdown);
         $location.path("/hunt");

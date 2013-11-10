@@ -12,14 +12,15 @@
         <br>
         <br>{{coupon}}
       </p>
-      <a class="button result-submit hunt-input-submit result-save" href="#">Save to My Rewards</a>
+      <a class="button result-submit hunt-input-submit result-save" ng-hide='saved' ng-click="toggleCoupon()">Save to My Rewards</a>
+      <a class="button result-submit hunt-input-submit result-saved" ng-show='saved' ng-click="toggleCoupon()">Saved to My Rewards</a>
     </div>
   </div>
   <div>
     <div class="play-again-result">
-      <p ng-hide="nextRoundStarted" class="p-result">The next round begins in {{time}}</p>
-      <p ng-show="nextRoundStarted" class="p-result">The next round has started</p>
+      <p ng-hide="nextRoundStarted" class="p-result">The next round begins in {{time}}.</p>
+      <p ng-show="nextRoundStarted" class="p-result">The next round has started!</p>
         <p class="p-result">Play again?</p>
-    </div><a class="button result-submit hunt-input-submit result-yes" href="#">Yes!</a>
+    </div><a class="button result-submit hunt-input-submit result-yes" ng-click="playAgain()">Yes!</a>
   </div>
 </div>

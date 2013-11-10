@@ -2,20 +2,20 @@ var httpGet = require('http-get');
 var config = require('../config');
 var leaderboard = require('../controllers/leaderBoard');
 var analytics = require('../controllers/analytics');
-var startOfRound;
 
 /////Game Config
-var roundLength = 20000;
-var restLength = 7000;
+var roundLength = 12000;
+var restLength = 6000;
 var startOfRound = null;
 
+// Storage
+var UPCList = [];
 var state = {
   'currentItem': {
       link: null,
       title: null,
       upc: null
-  },
-  'currentWinner': null
+  }
 };
 
 exports.getCurrentItem = function(req, res){
@@ -54,25 +54,28 @@ var hashString = function(str){
     return hash.toString().slice(1, 7);
 };
 
-var grabUPCs = function(){
-
-  for(var i = 0; i < webStoreItems.length; i++){
-    httpGet.get({
-      url: 'http://qe11-openapi.kohlsecommerce.com/' + webStoreItems[i].links[0].uri+'?skuDetail=true',
-      bufferType: "buffer",
-      headers: {
-        'X-APP-API_KEY': config['X-APP-API_KEY'],
-        'Accept': 'application/json'
-      },
-      }, function(error, result) {
-        if (error) {
-          console.error(error);
-        } else {
-          UPCList.push(JSON.parse(result.buffer).payload.products[0].SKUS[0].UPC.ID);
-        }
-      }
-    );
-  }
+var determineNextItem = function(){
+  var randomUPC = UPCList[~~(Math.random()*UPCList.length)];
+  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
+                bufferType: "buffer",
+                headers: {
+                  'X-APP-API_KEY': config['X-APP-API_KEY'],
+                  'Accept': 'application/json'
+                  }
+                };
+  httpGet.get(options, function (error, result) {
+    if (error) {
+      console.error(error);
+    } else {
+      var product = JSON.parse(result.buffer).payload.products[0];
+      state.currentItem = {
+        upc: randomUPC,
+        link: product.images[0].url,
+        title: product.productTitle.replace('&nbsp', ' ').replace('&reg', ''),
+        coupon: hashString(product.productTitle).slice(0,8)
+      };
+    }
+  });
 };
 
 var loadItems = function(){
@@ -96,7 +99,27 @@ var loadItems = function(){
   );
 };
 
-var DLcomplete = true;
+var grabUPCs = function(){
+  for(var i = 0; i < webStoreItems.length; i++){
+    httpGet.get({
+      url: 'http://qe11-openapi.kohlsecommerce.com/' + webStoreItems[i].links[0].uri+'?skuDetail=true',
+      bufferType: "buffer",
+      headers: {
+        'X-APP-API_KEY': config['X-APP-API_KEY'],
+        'Accept': 'application/json'
+      },
+      }, function(error, result) {
+        if (error) {
+          console.error(error);
+        } else {
+          UPCList.push(JSON.parse(result.buffer).payload.products[0].SKUS[0].UPC.ID);
+          if (UPCList.length === 20) eventLoop();
+        }
+      }
+    );
+  }
+};
+
 var eventLoop = function(){
   startOfRound = (new Date())/1;
   state.currentWinner = null;
@@ -105,9 +128,4 @@ var eventLoop = function(){
   setTimeout(eventLoop, roundLength + restLength);
 };
 
-
 loadItems();
-eventLoop();
-
-
-
