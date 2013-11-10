@@ -28,6 +28,7 @@ exports.showData = function(req,res){
   res.end(JSON.stringify(anal));
 }
 
+
 exports.won = function(item){
   var ref = myRoot.child("wins").child(item.upc);
   ref.transaction(function(current) {
@@ -41,3 +42,14 @@ exports.played = function(item){
     return current + 1;
   });
 }
+
+exports.recordUser = function(item){
+  item = JSON.parse(item);
+  var ref = myRoot.child('users').child(item.username);
+  ref.transaction(function(current){
+    return current +1;
+  });
+};
+
+
+

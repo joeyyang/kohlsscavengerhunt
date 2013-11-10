@@ -42,10 +42,14 @@ exports.getRoundData = function(req, res){
     //user has won
     console.log('player won');
     analytics.won(currentItem);
+
+    analytics.recordUser(req.query.userData);
   } else{
     //user did not win
     console.log('player did not won');
     analytics.played(currentItem);
+    analytics.won(currentItem);
+    analytics.recordUser(req.query.userData);
   }
   res.end(JSON.stringify(data));
 };
