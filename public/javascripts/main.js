@@ -30,7 +30,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 .factory('userService', function() {
   var service = {};
 
-  // service.firebase = new Firebase("https://kohlsscavengerhunt.firebaseio.com/");
+  service.firebase = new Firebase("https://kohlsscavengerhunt.firebaseio.com/");
 
   service.data = {
     zipCode: ""
@@ -99,18 +99,22 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     });
   };
 
-  // $scope.login = function() {
-  //   var auth = new FirebaseSimpleLogin(userService.firebase, function() {
-
-  //   });
-  // }
-
   $scope.login = function() {
-    getZip(function (zip) { userService.data.zipCode = zip; });
-    userService.data.gender = (Math.random() < 0.5 ? "male" : "female");
-    userService.data.name = (userService.data.gender === "female" ? "Betsy" : "Johnson");
-    userService.data.age = (Math.floor(Math.random()*80));
-    $location.path('/howToPlay');
+    var auth = new FirebaseSimpleLogin(userService.firebase, function(error, user) {
+      if (error) {
+        console.log("OMG ABORT ABORT WHY DID I DO THAT???: " + error);
+      } else if (user) {
+        getZip(function (zip) { userService.data.zipCode = zip; });
+        console.log(user);
+        userService.data.name = user.id;
+        userService.data.gender = (Math.random() < 0.5 ? "male" : "female");
+        userService.data.age = (Math.floor(Math.random()*80));
+        $location.path('/howToPlay');
+      } else {
+        $location.path('/');
+      }
+    });
+    auth.login('facebook');
   };
 
 })
