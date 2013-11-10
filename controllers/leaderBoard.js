@@ -1,16 +1,29 @@
 var scores = [];
+var players = 0;
+var finished = 0;
 
-exports.getWinners = function(n){
-  //n is number of winners to return
-  n > scores.length ? n = scores.length : n;
+exports.getWinners = function(n) {
   return scores.slice(0,n);
 };
 
-exports.addWinner = function(name, time, itemName){
+exports.addWinner = function(info){
   //push a new winner to the end of the array
-  scores.push({
-    name: name,
-    time: time,
-    itemName: itemName
-  })
+  console.log(info);
+  scores.unshift(info);
+};
+
+exports.addPlayer = function() {
+  players++;
+};
+
+exports.results = function(info) {
+  if (finished === 0) {
+    exports.addWinner(info);
+  }
+  return [++finished, players];
+};
+
+exports.newRound = function() {
+  players = 0;
+  finished = 0;
 };

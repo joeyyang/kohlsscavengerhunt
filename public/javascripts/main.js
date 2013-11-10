@@ -68,7 +68,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     var d = $q.defer();
     $http({
       url: "/getRoundData",
-      method: "GET"
+      method: "GET",
+      params: {userData: userService.data}
     }).success(function (data) {
       d.resolve(data);
     }).error(function (err) {
@@ -88,10 +89,13 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     function showPosition(position){
       lat = position.coords.latitude;
       lng = position.coords.longitude;
-      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=true_or_false')
+      $http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&sensor=false')
         .success(function(data) {
           console.log("Zip code downloaded.");
-          cb(data);
+          console.log(data);
+          var zip = JSON.stringify(data).match(/\"\d{5}\"/g)[0].slice(1, 6);
+          console.log("Zip: " + zip);
+          cb(zip);
       });
     });
   };
@@ -121,9 +125,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       storageService.roundEnd = new Date(data.roundEnd);
       storageService.nextRound = new Date(data.nextRound);
       storageService.coupon = data.item.coupon;
-      console.log(storageService);
       $scope.item = data.item;
-      console.log(data.item);
+      console.log(data.item.upc);
       $scope.time = Math.floor((storageService.roundEnd - new Date())/1000);
 
       var countdown = setInterval(function() {
@@ -167,7 +170,6 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     },
     function (err) {
       $scope.result = {
-        winner: unknown,
         place: ['?', '?']
       };
     }

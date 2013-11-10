@@ -1,6 +1,7 @@
 var httpGet = require('http-get');
 var config = require('../config');
 var leaderboard = require('../controllers/leaderBoard');
+var analytics = require('../controllers/analytics');
 var startOfRound;
 
 /////Game Config
@@ -17,23 +18,9 @@ var state = {
   'currentWinner': null
 };
 
-exports.getWinners = function(req, res) {
-  res.writeHead(200);
-  res.end(JSON.stringify(leaderboard.getWinners(req.query.numberOfWinners)));
-};
-
-exports.getRoundData = function(req, res){
-  res.writeHead(200);
-  var data = {
-    // winner: leaderboard.getWinners(1)[0],
-    winner: "James Bond",
-    place: [3, 25]
-  };
-  console.log(data);
-  res.end(JSON.stringify(data));
-};
-
 exports.getCurrentItem = function(req, res){
+  leaderboard.addPlayer();
+  analytics.add(req.query);
   res.writeHead(200);
   var data = {
     roundEnd: startOfRound + roundLength,
@@ -41,6 +28,20 @@ exports.getCurrentItem = function(req, res){
     item: state.currentItem
   };
   res.end(JSON.stringify(data));
+};
+
+exports.getRoundData = function(req, res){
+  res.writeHead(200);
+  var results = leaderboard.results(JSON.parse(req.query.userData));
+  var data = {
+    place: results.slice(1)
+  };
+  res.end(JSON.stringify(data));
+};
+
+exports.getWinners = function(req, res) {
+  res.writeHead(200);
+  res.end(JSON.stringify(leaderboard.getWinners(JSON.parse(req.query).numberOfWinners)));
 };
 
 var hashString = function(str){
@@ -74,12 +75,11 @@ var determineNextItem = function(){
     if (error) {
       console.error(error);
     } else {
-      // console.log(JSON.parse(result.buffer).payload.products[0]);
       var product = JSON.parse(result.buffer).payload.products[0];
       state.currentItem = {
         upc: randomUPC,
         link: product.images[0].url,
-        title: product.productTitle,
+        title: product.productTitle.replace('&nbsp', ' ').replace('&reg', ''),
         coupon: hashString(product.productTitle).slice(0,8)
       };
     }
@@ -90,6 +90,7 @@ var determineNextItem = function(){
 var eventLoop = function(){
   startOfRound = (new Date())/1;
   state.currentWinner = null;
+  leaderboard.newRound();
   determineNextItem();
   setTimeout(eventLoop, roundLength + restLength);
 };
