@@ -241,7 +241,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     if ($scope.saved) {
       delete storageService.savedCoupons[storageService.item.title];
     } else {
-      storageService.savedCoupons[storageService.item.itle] = storageService.item.coupon;
+      storageService.savedCoupons[storageService.item.title] = storageService.item.coupon;
     }
     $scope.saved = !$scope.saved;
     console.log(storageService.savedCoupons);

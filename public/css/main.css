@@ -72,6 +72,11 @@ p {
   color: white;
   font-size: 14px;
 }
+li {
+  color: white;
+  font-size: 14px;
+  list-style-type: none;
+}
 .button {
   display: inline-block;
   margin-top: 190px;
