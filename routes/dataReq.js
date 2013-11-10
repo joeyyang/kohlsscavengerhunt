@@ -54,38 +54,49 @@ var hashString = function(str){
     return hash.toString().slice(1, 7);
 };
 
-var determineNextItem = function(){
-  var upc = [727506537518,
-            760925051784,
-            786888332067,
-            649652095103,
-            400932356754];
+var grabUPCs = function(){
 
-  var randomUPC = upc[~~(Math.random()*upc.length)];
-  var options = {url: 'http://qe11-openapi.kohlsecommerce.com/v1/product?upc='+ randomUPC,
-                bufferType: "buffer",
-                headers: {
-                  'X-APP-API_KEY': config['X-APP-API_KEY'],
-                  'Accept': 'application/json'
-                  }
-                };
-
-  httpGet.get(options, function (error, result) {
-    if (error) {
-      console.error(error);
-    } else {
-      var product = JSON.parse(result.buffer).payload.products[0];
-      state.currentItem = {
-        upc: randomUPC,
-        link: product.images[0].url,
-        title: product.productTitle.replace('&nbsp', ' ').replace('&reg', ''),
-        coupon: hashString(product.productTitle).slice(0,8)
-      };
-    }
-  });
+  for(var i = 0; i < webStoreItems.length; i++){
+    httpGet.get({
+      url: 'http://qe11-openapi.kohlsecommerce.com/' + webStoreItems[i].links[0].uri+'?skuDetail=true',
+      bufferType: "buffer",
+      headers: {
+        'X-APP-API_KEY': config['X-APP-API_KEY'],
+        'Accept': 'application/json'
+      },
+      }, function(error, result) {
+        if (error) {
+          console.error(error);
+        } else {
+          UPCList.push(JSON.parse(result.buffer).payload.products[0].SKUS[0].UPC.ID);
+        }
+      }
+    );
+  }
 };
 
+var loadItems = function(){
+  //this will get hte top 99 most popular items.
+  httpGet.get({
+    url: 'http://qe11-openapi.kohlsecommerce.com/v1/recommendation?type=toptrending&limit=99',
+    bufferType: "buffer",
+    postalCode: '' + 94102,
+    headers: {
+      'X-APP-API_KEY': config['X-APP-API_KEY'],
+      'Accept': 'application/json'
+    },
+    }, function(error, result) {
+      if (error) {
+        console.error(error);
+      } else {
+        webStoreItems = JSON.parse(result.buffer).payload.recommendations[0].products;
+        grabUPCs();
+      }
+    }
+  );
+};
 
+var DLcomplete = true;
 var eventLoop = function(){
   startOfRound = (new Date())/1;
   state.currentWinner = null;
@@ -94,6 +105,9 @@ var eventLoop = function(){
   setTimeout(eventLoop, roundLength + restLength);
 };
 
+
+loadItems();
 eventLoop();
+
 
 
