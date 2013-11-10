@@ -10,6 +10,8 @@ var http = require('http');
 var path = require('path');
 var dataReq = require('./routes/dataReq');
 var querystring = require('querystring');
+var analytics = require('./controllers/analytics')
+
 
 var app = express();
 
@@ -30,6 +32,8 @@ if ('development' == app.get('env')) {
 app.get('/getCurrentItem', dataReq.getCurrentItem);
 app.get('/getRoundData', dataReq.getRoundData);
 app.get('/getWinners', dataReq.getWinners);
+app.get('/showData', analytics.showData);
+app.get('/won', analytics.won);
 
 
 

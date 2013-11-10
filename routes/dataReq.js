@@ -38,6 +38,13 @@ exports.getRoundData = function(req, res){
   var data = {
     place: place
   };
+  if(req.query.success ===true){
+    //user has won
+    analytics.won(state.currentItem);
+  } else{
+    //user did not win
+    analytics.lost(state.currentItem);
+  }
   res.end(JSON.stringify(data));
 };
 
