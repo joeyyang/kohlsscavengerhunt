@@ -10,8 +10,13 @@ var startOfRound = null;
 
 // Storage
 var UPCList = [];
-var state = {};
-var nextItemState = {};
+var currentItem = {};
+var nextItem = {
+        upc: "",
+        link: "",
+        title: "",
+        coupon: ""
+      };
 
 exports.getCurrentItem = function(req, res){
   leaderboard.addPlayer();
@@ -20,15 +25,17 @@ exports.getCurrentItem = function(req, res){
   var data = {
     roundEnd: startOfRound + roundLength,
     nextRound: startOfRound + roundLength + restLength,
-    item: state.currentItem
+    item: currentItem
   };
   res.end(JSON.stringify(data));
 };
 
 exports.getRoundData = function(req, res){
   res.writeHead(200);
+  var place = leaderboard.results(JSON.parse(req.query.userData));
+  if (place[0] > place[1]) place[0] = place[1]; // Bugfix.
   var data = {
-    place: leaderboard.results(JSON.parse(req.query.userData))
+    place: place
   };
   res.end(JSON.stringify(data));
 };
@@ -64,8 +71,7 @@ var determineNextItem = function(){
       console.error(error);
     } else {
       var product = JSON.parse(result.buffer).payload.products[0];
-      console.log('Name of random item picked:', product.productTitle);
-      nextItemState.currentItem = { //state.currentItem = {
+      nextItem = {
         upc: randomUPC,
         link: product.images[0].url,
         title: product.productTitle,
@@ -123,14 +129,14 @@ var grabUPCs = function(){
 };
 
 var eventLoop = function(){
-  console.log('--------------------')
-  console.log('Starting a new round')
+  console.log('--------------------');
+  console.log('Starting a new round');
   startOfRound = (new Date())/1;
-  state.currentWinner = null;
   leaderboard.newRound();
-  state = nextItemState;
+  currentItem = nextItem;
   determineNextItem();
-  setTimeout(eventLoop, roundLength + restLength);
+  console.log('Name of random item picked:', currentItem.title);
+  setTimeout(eventLoop, roundLength + restLength - 1000);
 };
 
 loadItems();

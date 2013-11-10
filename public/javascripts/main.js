@@ -81,12 +81,15 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
     return d.promise;
   };
 
-  service.getRoundData = function() {
+  service.getRoundData = function(success) {
     var d = $q.defer();
     $http({
       url: "/getRoundData",
       method: "GET",
-      params: {userData: userService.data}
+      params: {
+        userData: userService.data,
+        success: success
+      }
     }).success(function (data) {
       d.resolve(data);
     }).error(function (err) {
@@ -203,7 +206,8 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
 
 .controller("resultController", function(timeService, reqsService, storageService, $location, $scope) {
   if (storageService.resultData === null) {
-    reqsService.getRoundData().then(
+    console.log("Sending get request for round data.");
+    reqsService.getRoundData(storageService.success).then(
       function (data){
         storageService.resultData = data;
         $scope.result = data;

@@ -17,6 +17,7 @@ exports.addPlayer = function() {
 };
 
 exports.results = function(info) {
+  console.log("results called.");
   if (finished === 0) {
     exports.addWinner(info);
   }
@@ -24,6 +25,7 @@ exports.results = function(info) {
 };
 
 exports.newRound = function() {
+  console.log("newRound called");
   players = 0;
   finished = 0;
 };
