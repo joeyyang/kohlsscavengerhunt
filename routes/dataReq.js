@@ -71,7 +71,7 @@ var determineNextItem = function(){
       state.currentItem = {
         upc: randomUPC,
         link: product.images[0].url,
-        title: product.productTitle.replace('&nbsp', ' ').replace('&reg', ''),
+        title: product.productTitle.replace('&nbsp', ' ').replace('&reg', '').replace('SO; ', ''),
         coupon: hashString(product.productTitle).slice(0,8)
       };
     }
