@@ -156,7 +156,7 @@ var myApp = angular.module('kohlsApp', []).config(function($routeProvider, $loca
       // Hack to display item titles correctly.
       var div = document.createElement('div');
       div.innerHTML = data.item.title;
-      data.item.title = div.firstChild.nodeValue;
+      data.item.title = div.childNodes[0].nodeValue;
 
       storageService.nextRound = new Date(data.nextRound);
       storageService.item = data.item;

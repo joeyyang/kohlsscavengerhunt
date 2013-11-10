@@ -1,5 +1,5 @@
-<p>Your stash: </p>
+<h1 class="h1-result">Your stash: </h1>
 <ul>
-  <li ng-repeat="item in stash">{{item.coupon}} --- {{item.title}}</li>
+  <li class="p-result" ng-repeat="item in stash">{{item.title}}: {{item.coupon}}</li>
 </ul>
-<button ng-click="back()">Back to the game!</button>
+<button class="result-submit hunt-input-submit result-yes" ng-click="back()">Back to the game!</button>
