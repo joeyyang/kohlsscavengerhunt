@@ -89,7 +89,7 @@ p {
   text-decoration: none;
 }
 .button:hover {
-  background-color: rgba(123, 192, 65, 0.90);
+  background-color: #4da355;
   -webkit-transition: all 200ms ease;
   -o-transition: all 200ms ease;
   transition: all 200ms ease;
