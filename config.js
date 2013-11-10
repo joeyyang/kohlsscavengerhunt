@@ -1,0 +1,1 @@
+module.exports = {'X-APP-API_KEY':'bow0DMyPSUZAZIfCBsp48CoXmLUQhQmD'};
