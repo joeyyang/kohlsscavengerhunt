@@ -7,6 +7,10 @@
     #container{
       margin: 20px;
     }
+    #label-left{
+      margin-left:110px;
+      font-family:'Arial'
+    }
   </style>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -18,6 +22,12 @@
   <div id="container">
     <canvas id="myChart" width="1200" height="600"></canvas>
     <canvas id="myChart2" width="1200" height="600"></canvas>
+  </div>
+
+  <div id="label-left">
+    Legend: <br>
+    <span style="color:#787878">Total Attempts </span> 
+    <span style="color:#4da355">Correct Attempts </span> 
   </div>
 
   <script>
@@ -55,13 +65,13 @@
       scaleFontFamily : "'Arial'",
       
       //Number - Scale label font size in pixels  
-      scaleFontSize : 14,
+      scaleFontSize : 12,
       
       //String - Scale label font weight style  
       scaleFontStyle : "normal",
       
       //String - Scale label font colour  
-      scaleFontColor : "#666",  
+      scaleFontColor : "#121212",  
       
       ///Boolean - Whether grid lines are shown across the chart
       scaleShowGridLines : true,
@@ -105,14 +115,14 @@
       var dataSets = 
         [
           {
-          fillColor : "rgba(220,220,220,0.5)",
-          strokeColor : "rgba(220,220,220,1)",
+          fillColor : "#787878",
+          strokeColor : "#787878",
           data: []
           }
         ,
           {
-          fillColor : "rgba(151,187,205,0.5)",
-          strokeColor : "rgba(151,187,205,1)",
+          fillColor : "#4da355",
+          strokeColor : "#4da355",
           data : []
           }
       ]
@@ -136,8 +146,8 @@
       var dataSets = 
         [
           {
-          fillColor : "rgba(220,220,220,0.5)",
-          strokeColor : "rgba(220,220,220,1)",
+          fillColor : "#787878",
+          strokeColor : "#787878",
           data: []
           }
       ]
